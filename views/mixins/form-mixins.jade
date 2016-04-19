@@ -1,0 +1,85 @@
+mixin toggledFieldset(toggled, innerContainerId, text)
+    - var legAttr = toggled ? {'data-toggle':'collapse', 'data-target':'#'+innerContainerId, 'style':'cursor: pointer;'} : {};
+    - var classes = toggled ? 'container-fluid collapse in' : 'container-fluid';
+    fieldset
+        legend&attributes(legAttr)= text
+        div(class=classes id=innerContainerId)
+                block
+
+mixin inputGroupAddonText(text)
+    span( class="input-group-addon")= text
+
+mixin inputGroupAddonGlyph(glyph)
+    span( class="input-group-addon")
+        span( class="glyphicon glyphicon-#{glyph}")
+
+mixin formEdit(id, placeholder)
+    input(
+        class="form-control"
+        id= id
+        placeholder= placeholder
+        style="cursor: auto"
+    )&attributes(attributes)
+
+mixin formEditGrid(id, placeholder, editWidth)
+    div(class="col-lg-#{editWidth}")
+        .row
+            +formEdit(id, placeholder)&attributes(attributes)
+
+mixin textEdit(id, placeholder, editWidth)
+    +formEditGrid(id, placeholder, editWidth)(type="text")
+
+mixin dateEdit(id,  editWidth)
+    +formEditGrid(id, '', editWidth)(type="date")
+
+mixin emailEdit(id, placeholder, editWidth)
+    div(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +inputGroupAddonText('@')
+                +formEdit(id, placeholder)(type="email")
+
+
+mixin glyphEdit(id,placeholder, editWidth, glyph)
+    div(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +inputGroupAddonGlyph(glyph)
+                +formEdit(id, placeholder)&attributes(attributes)
+
+mixin phoneEdit(id,placeholder, editWidth, glyph)
+    div(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +inputGroupAddonGlyph(glyph)
+                +formEdit(id, placeholder)(type="tel" class="phone-mask")
+
+mixin selectEdit(id, editWidth, items)
+    div(class="col-lg-#{editWidth}")
+        .row
+            select(
+                class="form-control"
+                id= id
+            )
+                each item in items
+                    option= item
+
+mixin labeledTextEdit(id, text, labelWidth, editWidth)
+        label(for= id, class="col-lg-#{labelWidth} control-label")= text
+        +textEdit(id, text, editWidth)
+
+mixin labeledDateEdit(id, text, labelWidth, editWidth)
+    label(for= id, class="col-lg-#{labelWidth} control-label")= text
+    +dateEdit(id, editWidth)
+
+mixin labeledSelectEdit(id, text, labelWidth, editWidth, items)
+    label(for= id, class="col-lg-#{labelWidth} control-label")= text
+    +selectEdit(id, editWidth, items)
+
+mixin labeledEmailEdit(id, text, labelWidth, editWidth)
+    label(for= id, class="col-lg-#{labelWidth} control-label")= text
+    +emailEdit(id, text, editWidth)
+
+mixin labeledPhoneEdit(id, text, labelWidth, editWidth, glyph)
+    label(for= id, class="col-lg-#{labelWidth} control-label")= text
+    +phoneEdit(id, text, editWidth, glyph)

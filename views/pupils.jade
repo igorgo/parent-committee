@@ -1,5 +1,7 @@
 //
    Created by igorgo on 17.04.2016.
+
+include ./mixins/form-mixins.jade
 #pupils-container.container-fluid.page-container.hidden
     .row
         .jumbotron
@@ -22,99 +24,47 @@
                 form(id="pupils-edit-form", class="form-horizontal")
                     fieldset
                         legend Ученик
-                        .form-group
-                            label(for="inputLastName", class="col-lg-2 control-label") Фамилия
-                            .col-lg-4
-                                input(
-                                    type="text"
-                                    class="form-control"
-                                    id="inputLastName"
-                                    placeholder="Фамилия"
-                                    autocomplete="off"
-                                    style="cursor: auto"
-                                    tabindex="1"
-                                )
-                            label(for="inputBirthday", class="col-lg-2 control-label") Дата рождения
-                            .col-lg-4
-                                input(
-                                    type="date"
-                                    class="form-control"
-                                    id="inputBirthday"
-                                    placeholder="Дата рождения"
-                                    autocomplete="off"
-                                    style="cursor: auto"
-                                    tabindex="4"
-                                )
-                        .form-group
-                            label(for="inputFirstName", class="col-lg-2 control-label") Имя
-                            .col-lg-4
-                                input(
-                                    type="text"
-                                    class="form-control"
-                                    id="inputFirstName"
-                                    placeholder="Имя"
-                                    autocomplete="off"
-                                    style="cursor: auto"
-                                    tabindex="2"
-                                )
-                            label(for="inputGender", class="col-lg-2 control-label") Пол
-                            .col-lg-4
-                                select(
-                                    class="form-control"
-                                    id="inputGender"
-                                    placeholder="Пол"
-                                    tabindex="5"
-                                )
-                                    option
-                                    option Мужской
-                                    option Женский
-                        .form-group
-                            label(for="inputMiddleName", class="col-lg-2 control-label") Отчество
-                            .col-lg-4
-                                input(
-                                    type="text"
-                                    class="form-control"
-                                    id="inputMiddleName"
-                                    placeholder="Отчество"
-                                    autocomplete="off"
-                                    tabindex="3"
-                                )
-                            label(for="inputImail", class="col-lg-2 control-label") E-mail
-                            .col-lg-4
-                                input(
-                                    type="email"
-                                    class="form-control"
-                                    id="inputImail"
-                                    placeholder="E-mail"
-                                    tabindex="6"
-                                )
-                        .form-group
-                            .col-lg-12
-                                label(class="control-label") Адреса
-                            .col-lg-12
-                                .input-group
-                                    span( class="input-group-addon" aria-hidden="true")
-                                        span( class="glyphicon glyphicon-home" aria-hidden="true")
-                                    input(
-                                        type="text"
-                                        class="form-control"
-                                        id="inputLiveAddress"
-                                        placeholder="Адрес проживания"
-                                        autocomplete="off"
-                                        tabindex="7"
-                                    )
-                            .col-lg-12
-                                .input-group
-                                    span( class="input-group-addon")
-                                        span( class="glyphicon glyphicon-link")
-                                    input(
-                                        type="text"
-                                        class="form-control"
-                                        id="inputRegAddress"
-                                        placeholder="Адрес регистрации"
-                                        autocomplete="off"
-                                        tabindex="8"
-                                    )
+                        .container-fluid
+                            .row
+                                .container-fluid.col-lg-6
+                                    .row
+                                        +labeledTextEdit("inputLastName","Фамилия",4,8)
+                                    .row
+                                        +labeledTextEdit("inputFirstName","Имя",4,8)
+                                    .row
+                                        +labeledTextEdit("inputMiddleName","Отчество",4,8)
+                                .container-fluid.col-lg-6
+                                    .row
+                                        +labeledDateEdit("inputBirthday","Дата рождения",4,8)
+                                    .row
+                                        +labeledSelectEdit("inputGender", "Пол", 4, 8, ['', 'Мужской', 'Женский'])
+                                    .row
+                                        +labeledEmailEdit("inputImail","E-mail",4,8)
+                            .row
+                                .container-fluid
+                                    .row
+                                        label(class="control-label.col-lg-12") Адреса
+                                    .row
+                                        +glyphEdit('inputLiveAddress','Адрес проживания', 12, 'home')
+                                    .row
+                                        +glyphEdit('inputRegAddress','Адрес регистрации', 12, 'link')
+                            .row
+                                .container-fluid
+                                    .row
+                                        label(class="control-label") Телефон
+                                    .row
+                                        +phoneEdit('inputHomePhone','Домашний', 5, 'phone-alt')
+                                        .col-lg-2
+                                        +phoneEdit('inputCellPhone','Мобильный', 5, 'phone')
+                            .row
+                                .container-fluid
+                                    .row
+                                        label(class="control-label") Период обучения
+                                    .row
+                                        +labeledDateEdit("inputStudyFrom","c",1,4)
+                                        .col-lg-2
+                                        +labeledDateEdit("inputStudyTo","по",1,4)
+                    +toggledFieldset(true,'mather-inputs','Мама')
                         .form-group
                             .col-lg-12
                                 label(class="control-label") Телефон
@@ -125,7 +75,7 @@
                                     input(
                                     type="tel"
                                     class="form-control phone-mask"
-                                    id="inputHomePhone"
+                                    id="inputMWorkHomePhone"
                                     placeholder="Домашний"
                                     autocomplete="off"
                                     tabindex="9"
@@ -137,64 +87,11 @@
                                     input(
                                     type="tel"
                                     class="form-control phone-mask"
-                                    id="inputCellPhone"
+                                    id="inputMCellPhone"
                                     placeholder="Мобильный"
                                     autocomplete="off"
                                     tabindex="10"
                                     )
-                        .form-group
-                            label(class="col-lg-4 control-label" style="text-align: left;") Период обучения
-                            .col-lg-4
-                                input(
-                                type="date"
-                                class="form-control"
-                                id="inputStudyFrom"
-                                placeholder="с"
-                                autocomplete="off"
-                                style="cursor: auto"
-                                tabindex="11"
-                                )
-                            .col-lg-4
-                                input(
-                                type="date"
-                                class="form-control"
-                                id="inputStudyTo"
-                                placeholder="по"
-                                autocomplete="off"
-                                style="cursor: auto"
-                                tabindex="12"
-                                )
-                    fieldset
-                        legend(data-toggle="collapse" data-target="#mather-inputs") Мама
-                            //a(data-toggle="collapse" data-target="#mather-inputs" href="#") Мама
-                        #mather-inputs.container-fluid.collapse.in
-                            .form-group
-                                .col-lg-12
-                                    label(class="control-label") Телефон
-                                .col-lg-6
-                                    .input-group
-                                        span( class="input-group-addon" aria-hidden="true")
-                                            span( class="glyphicon glyphicon-phone-alt")
-                                        input(
-                                        type="tel"
-                                        class="form-control phone-mask"
-                                        id="inputMWorkHomePhone"
-                                        placeholder="Домашний"
-                                        autocomplete="off"
-                                        tabindex="9"
-                                        )
-                                .col-lg-6
-                                    .input-group
-                                        span( class="input-group-addon")
-                                            span( class="glyphicon glyphicon-phone")
-                                        input(
-                                        type="tel"
-                                        class="form-control phone-mask"
-                                        id="inputMCellPhone"
-                                        placeholder="Мобильный"
-                                        autocomplete="off"
-                                        tabindex="10"
-                                        )
                     fieldset
                         legend Папа
 
