@@ -4,7 +4,7 @@ mixin toggledFieldset(toggled, innerContainerId, text)
     fieldset
         legend&attributes(legAttr)= text
         div(class=classes id=innerContainerId)
-                block
+            block
 
 mixin inputGroupAddonText(text)
     span( class="input-group-addon")= text

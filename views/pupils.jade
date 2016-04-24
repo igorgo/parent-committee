@@ -1,103 +1,33 @@
-//
-   Created by igorgo on 17.04.2016.
-
+extends layout
 include ./mixins/form-mixins.jade
-#pupils-container.container-fluid.page-container.hidden
-    .row
-        .jumbotron
-            h1 Наши ученики
-            p Список учеников и их родителей
-    .row
-        .panel.panel-default.col-lg-6
-            .panel-body
-                table(id="pupils-table", data-toggle="table", class="col-lg-6")
-                    thead
-                        tr
-                            th(data-field="id", data-halign="center") №
-                            th(data-field="fullname", data-halign="center") ФИО
-                            th(data-field="birthday", data-halign="center") ДР
-        #pupils-detail.panel.panel-default.col-lg-6
-            .panel-body
-                p Дали будэ
-        #pupils-edit-panel.panel.panel-default.col-lg-6.hidden
-            .panel-body
-                form(id="pupils-edit-form", class="form-horizontal")
-                    fieldset
-                        legend Ученик
-                        .container-fluid
-                            .row
-                                .container-fluid.col-lg-6
-                                    .row
-                                        +labeledTextEdit("inputLastName","Фамилия",4,8)
-                                    .row
-                                        +labeledTextEdit("inputFirstName","Имя",4,8)
-                                    .row
-                                        +labeledTextEdit("inputMiddleName","Отчество",4,8)
-                                .container-fluid.col-lg-6
-                                    .row
-                                        +labeledDateEdit("inputBirthday","Дата рождения",4,8)
-                                    .row
-                                        +labeledSelectEdit("inputGender", "Пол", 4, 8, ['', 'Мужской', 'Женский'])
-                                    .row
-                                        +labeledEmailEdit("inputImail","E-mail",4,8)
-                            .row
-                                .container-fluid
-                                    .row
-                                        label(class="control-label.col-lg-12") Адреса
-                                    .row
-                                        +glyphEdit('inputLiveAddress','Адрес проживания', 12, 'home')
-                                    .row
-                                        +glyphEdit('inputRegAddress','Адрес регистрации', 12, 'link')
-                            .row
-                                .container-fluid
-                                    .row
-                                        label(class="control-label") Телефон
-                                    .row
-                                        +phoneEdit('inputHomePhone','Домашний', 5, 'phone-alt')
-                                        .col-lg-2
-                                        +phoneEdit('inputCellPhone','Мобильный', 5, 'phone')
-                            .row
-                                .container-fluid
-                                    .row
-                                        label(class="control-label") Период обучения
-                                    .row
-                                        +labeledDateEdit("inputStudyFrom","c",1,4)
-                                        .col-lg-2
-                                        +labeledDateEdit("inputStudyTo","по",1,4)
-                    +toggledFieldset(true,'mather-inputs','Мама')
-                        .form-group
-                            .col-lg-12
-                                label(class="control-label") Телефон
-                            .col-lg-6
-                                .input-group
-                                    span( class="input-group-addon" aria-hidden="true")
-                                        span( class="glyphicon glyphicon-phone-alt")
-                                    input(
-                                    type="tel"
-                                    class="form-control phone-mask"
-                                    id="inputMWorkHomePhone"
-                                    placeholder="Домашний"
-                                    autocomplete="off"
-                                    tabindex="9"
-                                    )
-                            .col-lg-6
-                                .input-group
-                                    span( class="input-group-addon")
-                                        span( class="glyphicon glyphicon-phone")
-                                    input(
-                                    type="tel"
-                                    class="form-control phone-mask"
-                                    id="inputMCellPhone"
-                                    placeholder="Мобильный"
-                                    autocomplete="off"
-                                    tabindex="10"
-                                    )
-                    fieldset
-                        legend Папа
 
-        .form-group
-                            .col-lg-12
-                                button(type="reset" class="btn btn-default pull-right") Отмена
-                                button(class="btn btn-primary pull-right", id="pupil-add-do-button") Добавить
-    .row
-        a(href='#', class="btn btn-default", id="pupil-add-button") Добавить ученика
+block content
+    #pupils-container.container-fluid.page-container
+        .row
+            .jumbotron
+                h1 Наши ученики
+                p Список учеников и их родителей
+        .row
+            .panel.panel-default.col-lg-6
+                .panel-body
+                    .row
+                        table(
+                        id="pupils-table",
+                        data-toggle="table",
+                        data-url="/pupils/shortlist",
+                        data-click-to-select="true",
+                        data-single-select="true")
+                            thead
+                                tr
+                                    th(data-field="state" data-checkbox="true")
+                                    th(data-field="rn", data-halign="center") №
+                                    th(data-field="shortname", data-halign="center") ФИО
+                                    th(data-field="birthday_s", data-halign="center") ДР
+                    .row(style="margin-top:15px")
+                        a#pupil-add-button.btn.btn-default(href='#') Добавить ученика
+            include ./pupils-edit.jade
+            .col-lg-6
+                #pupils-detail.panel.panel-default(data-spy="affix" data-offset-top="373" data-offset-bottom="0")
+                    include ./pupils-info.jade
+
+

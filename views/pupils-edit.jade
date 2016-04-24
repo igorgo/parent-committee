@@ -1,0 +1,96 @@
+//
+   Created by igorgo on 19.04.2016.
+#pupils-edit-panel.panel.panel-default.col-lg-6.hidden
+    .panel-body
+        form(id="pupils-edit-form", class="form-horizontal")
+            fieldset
+                legend Ученик
+                .container-fluid
+                    .row
+                        .container-fluid.col-lg-6
+                            .row
+                                +labeledTextEdit("inputLastName","Фамилия",4,8)
+                            .row
+                                +labeledTextEdit("inputFirstName","Имя",4,8)
+                            .row
+                                +labeledTextEdit("inputMiddleName","Отчество",4,8)
+                        .container-fluid.col-lg-6
+                            .row
+                                +labeledDateEdit("inputBirthday","Дата рождения",4,8)
+                            .row
+                                +labeledSelectEdit("inputGender", "Пол", 4, 8, ['', 'Мужской', 'Женский'])
+                            .row
+                                +labeledEmailEdit("inputEmail","E-mail",4,8)
+                    .row
+                        .container-fluid
+                            .row
+                                label(class="control-label.col-lg-12") Адреса
+                            .row
+                                +glyphEdit('inputLiveAddress','Адрес проживания', 12, 'home')
+                            .row
+                                +glyphEdit('inputRegAddress','Адрес регистрации', 12, 'link')
+                    .row
+                        .container-fluid
+                            .row
+                                label(class="control-label") Телефон
+                            .row
+                                +labeledPhoneEdit('inputHomePhone','Домашний', 2, 4, 'phone-alt')
+                                +labeledPhoneEdit('inputCellPhone','Мобильный',2, 4, 'phone')
+                    .row
+                        .container-fluid
+                            .row
+                                label(class="control-label") Период обучения
+                            .row
+                                +labeledDateEdit("inputStudyFrom","c",2,4)
+                                +labeledDateEdit("inputStudyTill","по",2,4)
+            +toggledFieldset(true,'mother-inputs','Мама')
+                .row
+                    .container-fluid.col-lg-6
+                        .row
+                            +labeledTextEdit("inputMotherLastName","Фамилия",4,8)
+                        .row
+                            +labeledTextEdit("inputMotherFirstName","Имя",4,8)
+                        .row
+                            +labeledTextEdit("inputMotherMiddleName","Отчество",4,8)
+                    .container-fluid.col-lg-6
+                        .row
+                            +labeledDateEdit("inputMotherBirthday","Дата рождения",4,8)
+                        .row
+                            +labeledPhoneEdit("inputMotherCellPhone", "Телефон", 4, 8, 'phone')
+                        .row
+                            +labeledEmailEdit("inputMotherEmail","E-mail",4,8)
+                .row
+                    label(class="control-label") Место работы
+                .row
+                    +textEdit("inputMotherWorkplace", 'Место работы', 12)
+                .row
+                    +labeledTextEdit("inputMotherPost", 'Должность', 2, 4)
+                    +labeledPhoneEdit('inputMotherWorkPhone','Рабочий', 2, 4, 'phone-alt')
+            +toggledFieldset(true,'father-inputs','Папа')
+                .row
+                    .container-fluid.col-lg-6
+                        .row
+                            +labeledTextEdit("inputFatherLastName","Фамилия",4,8)
+                        .row
+                            +labeledTextEdit("inputFatherFirstName","Имя",4,8)
+                        .row
+                            +labeledTextEdit("inputFatherMiddleName","Отчество",4,8)
+                    .container-fluid.col-lg-6
+                        .row
+                            +labeledDateEdit("inputFatherBirthday","Дата рождения",4,8)
+                        .row
+                            +labeledPhoneEdit("inputFatherCellPhone", "Телефон", 4, 8, 'phone')
+                        .row
+                            +labeledEmailEdit("inputFatherEmail","E-mail",4,8)
+                .row
+                    label(class="control-label") Место работы
+                .row
+                    +textEdit("inputFatherWorkplace", 'Место работы', 12)
+                .row
+                    +labeledTextEdit("inputFatherPost", 'Должность', 2, 4)
+                    +labeledPhoneEdit('inputFatherWorkPhone','Рабочий', 2, 4, 'phone-alt')
+            .container-fluid(style="margin-top:15px")
+                .row
+                    button(type="reset" id="pupil-add-cancel-button" class="btn btn-default pull-right") Отмена
+                    a(href='#', class="btn btn-default pull-right", id="pupil-add-do-button" style="margin-right:15px") Добавить
+                    a(href='#', class="btn btn-default pull-right", id="pupil-upd-do-button" style="margin-right:15px") Добавить
