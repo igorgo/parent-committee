@@ -10,6 +10,11 @@ a {
 #pupils-detail-body.affix {
     top: 20px;
 }
+
 #pupils-detail.affix {
+    top: 20px;
+}
+
+#donates-right-panel.affix {
     top: 20px;
 }

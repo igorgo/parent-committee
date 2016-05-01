@@ -1,9 +1,55 @@
 extends layout
+include ./mixins/form-mixins.jade
 
 block content
     #donates-container.container-fluid.page-container
         .row
             .jumbotron
                 h1 Пожертвования
-                p Чтобы всё было хорошо, родители должны сдавать денежки!
-
+                p Чтобы детки хорошо учились, родители должны сдавать денежки!
+        .row
+            .col-lg-6
+                .container-fluid
+                    .panel.panel-default
+                        .panel-heading
+                            h4.panel-title Должники
+                        .panel-body
+                            .row
+                                table(
+                                id="debtor-table",
+                                data-toggle="table",
+                                data-url="/donates/debtors",
+                                data-id-field="rn")
+                                    thead
+                                        tr
+                                            th(data-field="shortName", data-halign="center") ФИО
+                                            th(
+                                            data-field="debtSumm",
+                                            data-halign="center",
+                                            data-align="right",
+                                            data-formatter="formatCurrency") Сумма
+            .col-lg-6
+                #donates-right-panel.container-fluid(data-spy="affix" data-offset-top="373" data-offset-bottom="0")
+                    .panel.panel-default
+                        .panel-heading
+                            h4.panel-title Внесение в кассу
+                        #donates-form-donate.panel-body
+                                p Форма сдал
+                    .panel.panel-default
+                        .panel-heading(role="tab")
+                            h4.panel-title
+                                a(role="button", data-toggle="collapse", href="#donates-form-make-debt") Начислить всем
+                        #donates-form-make-debt.panel-collapse.collapse
+                            .panel-body
+                                .row
+                                    .container-fluid.col-lg-6
+                                        .row
+                                            +labeledDateEdit("form-make-debt-date","Дата",4,8)
+                                    .container-fluid.col-lg-6
+                                        .row
+                                            +labeledCurrencyEdit("form-make-debt-summ","Сумма",4,8)
+                                .row
+                                    .container-fluid(style="margin-top:15px")
+                                        .row
+                                            a(href='#', class="btn btn-default pull-right", id="form-make-debt-cancel" style="margin-right:15px") Отмена
+                                            a(href='#', class="btn btn-default pull-right", id="form-make-debt-ok" style="margin-right:15px") OK

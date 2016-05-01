@@ -32,6 +32,17 @@ mixin textEdit(id, placeholder, editWidth)
 mixin dateEdit(id,  editWidth)
     +formEditGrid(id, '', editWidth)(type="date")
 
+mixin numberEdit(id,  editWidth)
+    +formEditGrid(id, '0', editWidth)(class="text-right" type="number")
+
+mixin currencyEdit(id, editWidth)
+    div(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +formEdit(id, '0,00', editWidth)(class="text-right" type="number", step="0.01")
+                +inputGroupAddonText('₴')
+
+
 mixin emailEdit(id, placeholder, editWidth)
     div(class="col-lg-#{editWidth}")
         .row
@@ -65,12 +76,20 @@ mixin selectEdit(id, editWidth, items)
                     option= item
 
 mixin labeledTextEdit(id, text, labelWidth, editWidth)
-        label(for= id, class="col-lg-#{labelWidth} control-label")= text
-        +textEdit(id, text, editWidth)
+    label(for= id, class="col-lg-#{labelWidth} control-label")= text
+    +textEdit(id, text, editWidth)
 
 mixin labeledDateEdit(id, text, labelWidth, editWidth)
     label(for= id, class="col-lg-#{labelWidth} control-label")= text
     +dateEdit(id, editWidth)
+
+mixin labeledNumberEdit(id, text, labelWidth, editWidth)
+    label(for= id, class="col-lg-#{labelWidth} control-label")= text
+    +numberEdit(id, editWidth)
+
+mixin labeledCurrencyEdit(id, text, labelWidth, editWidth)
+    label(for= id, class="col-lg-#{labelWidth} control-label")= text
+    +currencyEdit(id, editWidth)
 
 mixin labeledSelectEdit(id, text, labelWidth, editWidth, items)
     label(for= id, class="col-lg-#{labelWidth} control-label")= text

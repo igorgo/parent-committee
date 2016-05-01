@@ -16,13 +16,14 @@ block content
                         data-toggle="table",
                         data-url="/pupils/shortlist",
                         data-click-to-select="true",
-                        data-single-select="true")
+                        data-single-select="true"
+                        data-id-field="rn")
                             thead
                                 tr
                                     th(data-field="state" data-checkbox="true")
-                                    th(data-field="rn", data-halign="center") №
-                                    th(data-field="shortname", data-halign="center") ФИО
-                                    th(data-field="birthday_s", data-halign="center") ДР
+                                    th(data-field="rowno", data-halign="center") №
+                                    th(data-field="shortName", data-halign="center") ФИО
+                                    th(data-field="birthdayString", data-halign="center") ДР
                     .row(style="margin-top:15px")
                         a#pupil-add-button.btn.btn-default(href='#') Добавить ученика
             include ./pupils-edit.jade

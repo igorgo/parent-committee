@@ -3,18 +3,6 @@
  */
 var express = require('express');
 var router = express.Router();
-var pupilsSchema = require('../schemas/pupils-schema');
-var countersSchema = require('../schemas/counters-schema');
-
-Date.prototype.yyyymmdd = function() {
-    var yyyy = this.getFullYear().toString();
-    var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based
-    var dd  = this.getDate().toString();
-    return yyyy +'-'+ (mm[1]?mm:"0"+mm[0]) +'-'+ (dd[1]?dd:"0"+dd[0]); // padding
-};
-
-
-
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -22,58 +10,161 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/pupilinfo/:rn', function (req, res) {
-    var Pupil = req.dbConnection.model('Pupil', pupilsSchema, 'pupils');
-    Pupil.find({'rn': req.params.rn}, function(err, pupil){
-        if (err)
-            res.send(err);
-        res.json(pupil);
-    });
+    req.app.locals.sqliteDbConnection.get(
+        "SELECT rowid, * FROM pupils WHERE rowid = $rn", {$rn: req.params.rn}, function (err, pupil) {
+            if (err)
+                res.send(err);
+            res.json(pupil);
+        }
+    );
 });
 
 router.get('/shortlist', function (req, res) {
-    var Pupil = req.dbConnection.model('Pupil', pupilsSchema, 'pupils');
-    Pupil.find({}, 'rn name birthday', {sort: {rn: 1}}).lean().exec( function (err, docs) {
-        if (err) next(err);
-        var t = docs;
-         docs.forEach(function (doc, i, arr) {
-/*
-             console.info(typeof doc);
-             var v = doc;
-            //console.info(doc.name);
-*/
+    //console.log(req.app.locals.dataCache.pupilsShortList);
+    res.status(200).json(req.app.locals.dataCache.pupilsShortList);
+});
 
-             var d = new Date(doc.birthday);
-             doc.birthday_s = d.ddmmyyyy();
-
-             doc.shortname = [doc.name.last, doc.name.first].filter(function (val) {
-                return val;
-            }).join(' ');
-/*
-             v.eee = "dddd";
-            arr[i] =  v;
-            console.info(v);
-*/
-        });
-
-        //console.info(t);
-        res.status(200).json(docs);
-    });
-
-    /*    var userModel = req.dbConnection.model('userlist', userListSchema, 'userlist');
-     userModel.find({}, null, {}, function (err, docs) {
-     if (err) next(err);
-     if (!docs) console.info('пусто');
-     res.status(200).json(docs);
-     });*/
+router.post('/updpupil', function (req, res) {
+    var curPupil = JSON.parse(req.body.json_string);
+    req.app.locals.sqliteDbConnection.run(
+        "UPDATE pupils SET " +
+        "   name_first = $name_first," +
+        "   name_middle = $name_middle," +
+        "   name_last = $name_last," +
+        "   birthday = $birthday," +
+        "   gender = $gender," +
+        "   email = $email," +
+        "   address_live = $address_live," +
+        "   address_reg = $address_reg," +
+        "   phone_home = $phone_home," +
+        "   phone_cell = $phone_cell," +
+        "   studied_from = $studied_from," +
+        "   studied_till = $studied_till," +
+        "   mother_name_first = $mother_name_first," +
+        "   mother_name_middle = $mother_name_middle," +
+        "   mother_name_last = $mother_name_last," +
+        "   mother_birthday = $mother_birthday," +
+        "   mother_email = $mother_email," +
+        "   mother_phone = $mother_phone," +
+        "   mother_work_place = $mother_work_place," +
+        "   mother_work_post = $mother_work_post," +
+        "   mother_work_phone = $mother_work_phone," +
+        "   father_name_first = $father_name_first," +
+        "   father_name_middle = $father_name_middle," +
+        "   father_name_last = $father_name_last," +
+        "   father_birthday = $father_birthday," +
+        "   father_email = $father_email," +
+        "   father_phone = $father_phone," +
+        "   father_work_place = $father_work_place," +
+        "   father_work_post = $father_work_post," +
+        "   father_work_phone =$father_work_phone" +
+        " WHERE rowid = $rn",
+        curPupil,
+        function (err) {
+            if (err) {
+                next(err);
+            } else {
+                require('../pupils-cache').setShortList(req.app);
+            }
+            res.json(
+                {
+                    "status": err === null ? 'success' : 'error',
+                    "error": err,
+                    "rn": curPupil.$rn
+                }
+            );
+        }
+    );
 
 });
 
 router.post('/addpupil', function (req, res) {
+    var pupil = JSON.parse(req.body.json_string);
+    req.app.locals.sqliteDbConnection.run(
+        "INSERT INTO pupils (" +
+        "   name_first," +
+        "   name_middle," +
+        "   name_last," +
+        "   birthday," +
+        "   gender," +
+        "   email," +
+        "   address_live," +
+        "   address_reg," +
+        "   phone_home," +
+        "   phone_cell," +
+        "   studied_from," +
+        "   studied_till," +
+        "   mother_name_first," +
+        "   mother_name_middle," +
+        "   mother_name_last," +
+        "   mother_birthday," +
+        "   mother_email," +
+        "   mother_phone," +
+        "   mother_work_place," +
+        "   mother_work_post," +
+        "   mother_work_phone," +
+        "   father_name_first," +
+        "   father_name_middle," +
+        "   father_name_last," +
+        "   father_birthday," +
+        "   father_email," +
+        "   father_phone," +
+        "   father_work_place," +
+        "   father_work_post," +
+        "   father_work_phone" +
+        ") VALUES ( " +
+        "   $name_first," +
+        "   $name_middle," +
+        "   $name_last," +
+        "   $birthday," +
+        "   $gender," +
+        "   $email," +
+        "   $address_live," +
+        "   $address_reg," +
+        "   $phone_home," +
+        "   $phone_cell," +
+        "   $studied_from," +
+        "   $studied_till," +
+        "   $mother_name_first," +
+        "   $mother_name_middle," +
+        "   $mother_name_last," +
+        "   $mother_birthday," +
+        "   $mother_email," +
+        "   $mother_phone," +
+        "   $mother_work_place," +
+        "   $mother_work_post," +
+        "   $mother_work_phone," +
+        "   $father_name_first," +
+        "   $father_name_middle," +
+        "   $father_name_last," +
+        "   $father_birthday," +
+        "   $father_email," +
+        "   $father_phone," +
+        "   $father_work_place," +
+        "   $father_work_post," +
+        "   $father_work_phone" +
+        ")",
+        pupil,
+        function (err) {
+            if (err) {
+                next(err);
+            } else {
+                require('../pupils-cache').setShortList(req.app);
+            }
+            res.json(
+                {
+                    "status": err === null ? 'success' : 'error',
+                    "error": err,
+                    "rn": this.lastID
+                }
+            );
+        }
+    )
+    ;
 
-    var Counter = req.dbConnection.model('Counter', countersSchema, 'counters');
-    var Pupil = req.dbConnection.model('Pupil', pupilsSchema, 'pupils');
+/*    var Counter = req.app.locals.dbConnection.model('Counter', countersSchema, 'counters');
+    var Pupil = req.app.locals.dbConnection.model('Pupil', pupilsSchema, 'pupils');
     var pupil = new Pupil(JSON.parse(req.body.json_string));
-    //var pupil = new Pupil(req.body);
 
     Counter.increment('pupils', function (err, result) {
         if (err) {
@@ -83,7 +174,11 @@ router.post('/addpupil', function (req, res) {
         var nrn = result.seq;
         pupil.rn = nrn;
         pupil.save(function (err) {
-            if (err) next(err);
+            if (err) {
+                next(err);
+            } else {
+                require('../pupils-cache').setShortList(req.app);
+            }
             res.json(
                 {
                     "status": err === null ? 'success' : 'error',
@@ -92,7 +187,7 @@ router.post('/addpupil', function (req, res) {
                 }
             );
         });
-    });
+    });*/
 });
 
 

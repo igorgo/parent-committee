@@ -1,10 +1,16 @@
-Date.prototype.ddmmyyyy = function() {
+Date.prototype.ddmmyyyy = function () {
     var yyyy = this.getFullYear().toString();
-    var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based
-    var dd  = this.getDate().toString();
-    return  (dd[1]?dd:"0"+dd[0]) + "." + (mm[1]?mm:"0"+mm[0]) + "." + yyyy; // padding
+    var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
+    var dd = this.getDate().toString();
+    return (dd[1] ? dd : "0" + dd[0]) + "." + (mm[1] ? mm : "0" + mm[0]) + "." + yyyy; // padding
 };
 
+Date.prototype.yyyymmdd = function () {
+    var yyyy = this.getFullYear().toString();
+    var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
+    var dd = this.getDate().toString();
+    return yyyy + "-" + (mm[1] ? mm : "0" + mm[0]) + "-" + (dd[1] ? dd : "0" + dd[0]); // padding
+};
 
 var express = require('express');
 var path = require('path');
@@ -12,23 +18,31 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-// Database
-//mongodb://user:password@host:port/dbname?authSource=dbWithUserCredentials
-var dbUrl = 'mongodb://go:go@127.0.0.1:27017/parent-committee';
-var mongoose = require('mongoose');
-var dbConnection = mongoose.createConnection(dbUrl);
-dbConnection.on('error', console.error.bind(console, 'dbConnection error:'));
-dbConnection.on('error', console.error.bind(console, 'dbConnection error:'));
-dbConnection.once('open', function () {
-    console.info('connected to database')
-});
-
+var app = express();
 var routes = require('./routes/index');
 var pupils = require('./routes/pupils-routers');
-var donates = require('./routes/donates');
+var donates = require('./routes/donates-routes');
 var expenses = require('./routes/expenses');
 
-var app = express();
+var sqliteDbConnection = require("./schemas/sqlite-db");
+var updater = require("./schemas/db-updater");
+app.locals.sqliteDbConnection = sqliteDbConnection;
+// массив кэшей
+app.locals.dataCache = {};
+
+// Короткий список действующих учеников в кеш
+
+
+updater(sqliteDbConnection)
+    .then(function (){
+        require('./pupils-cache').setShortList(app);
+    })
+    .catch(function (err) {
+        console.error(err);
+        process.exit(1);
+    });
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -42,10 +56,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(function (req, res, next) {
+/*app.use(function (req, res, next) {
     req.dbConnection = dbConnection;
     next();
-});
+});*/
 
 app.use('/', routes);
 app.use('/pupils', pupils);
