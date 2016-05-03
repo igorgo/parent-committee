@@ -11,6 +11,7 @@ router.get('/', function (req, res) {
 
 router.get('/debtors', function (req, res, next) {
     var sql = "SELECT " +
+        "  d.pupil as rn, " +
         "  p.name_last || ' ' || p.name_first as shortName, " +
         "  sum(d.summ) as debtSumm " +
         "FROM " +
@@ -18,8 +19,7 @@ router.get('/debtors', function (req, res, next) {
         "  pupils p " +
         "WHERE " +
         " d.pupil = p.rowid " +
-        "GROUP BY p.name_last, p.name_first ";
-    console.log(sql);
+        "GROUP BY d.pupil, p.name_last, p.name_first ";
     req.app.locals.sqliteDbConnection.all(
         sql,
         function (err, debts) {
@@ -27,19 +27,94 @@ router.get('/debtors', function (req, res, next) {
                 next(err);
             } else {
                 debts.sort(function (s1, s2) {
-                 var diff = s1.debtSumm - s2.debtSumm;
-                 if (diff === 0) {
-                 return (s1.shortName).toString().localeCompare((s2.shortName).toString());
-                 } else {
-                 return diff;
-                 }
-                 });
+                    var diff = s2.debtSumm - s1.debtSumm;
+                    if (diff === 0) {
+                        return (s1.shortName).toString().localeCompare((s2.shortName).toString());
+                    } else {
+                        return diff;
+                    }
+                });
                 res.json(debts);
             }
         }
     );
-})
-;
+});
+
+router.post("/makedonate", function (req, res, next) {
+    var donateSumm = req.body.summ;
+    var donateDate = new Date(req.body.date).yyyymmdd();
+    var donatePupil = req.body.pupil;
+    var db = req.app.locals.sqliteDbConnection;
+    db.run(
+        "INSERT INTO donates " +
+        "(  pupil, summ, date ) " +
+        "VALUES " +
+        "( $pupil, $summ, $date )",
+        {
+            $pupil: donatePupil,
+            $summ: -donateSumm,
+            $date: donateDate
+        }, function (err) {
+            if (err) next(err);
+            else {
+                db.run(
+                    "INSERT INTO cash " +
+                    "( oper_date, oper_type, oper_id, oper_sum ) " +
+                    "VALUES " +
+                    "( $oper_date, 'I', $oper_id, $oper_sum )",
+                    {
+                        $oper_date: donateDate,
+                        $oper_id: this.lastID,
+                        $oper_sum: donateSumm
+                    },
+                    function (err) {
+                        if (err) next(err);
+                        else res.json(
+                            {
+                                "status": 'success'
+                            }
+                        );
+                    }
+                );
+
+            }
+
+        }
+    );
+});
+router.get('/pupilopers/:pupil', function (req, res) {
+    var sql = "SELECT " +
+        "  d.rowid as id, " +
+        "  d.date as oper_date, " +
+        "  d.summ as oper_summ " +
+        "FROM " +
+        "  donates d," +
+        "  pupils p " +
+        "WHERE " +
+        " d.pupil = p.rowid " +
+        " AND d.pupil = $pupil " +
+        " ORDER BY d.date DESC";
+    var params = {$pupil:req.params.pupil};
+    function cb(err,opers) {
+        if (err) {
+            next(err);
+        } else {
+            if (opers.length > 0) {
+                opers.forEach(function (oper) {
+                    if (oper.oper_summ < 0) {
+                        oper.oper_type = "Взнос";
+                        oper.oper_summ = -oper.oper_summ;
+                    } else {
+                        oper.oper_type = "Начисление";
+                    }
+                });
+            }
+            res.status(200).json(opers);
+        }
+    }
+    req.app.locals.sqliteDbConnection.all(sql,params,cb);
+
+});
 
 router.post('/makedebt', function (req, res, next) {
     var debtSumm = req.body.summ;
@@ -69,7 +144,7 @@ router.post('/makedebt', function (req, res, next) {
                     {
                         $pupil: pupil.rn,
                         $summ: debtSumm,
-                        $date: debtDate
+                        $date: debtDate.yyyymmdd()
                     }, function (err) {
                         if (insError) next(err);
                     }

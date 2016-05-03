@@ -5,7 +5,7 @@
  * Created by igorgo on 29.04.2016.
  */
 var Promise = require('promise');
-const CURRENT_DB_VERSION = 2;
+const CURRENT_DB_VERSION = 3;
 var dbVerOnStart;
 
 function checkSchemaExists(db) {
@@ -78,34 +78,6 @@ function updateDbVersion(args) {
     });
 }
 
-
-function updateTo2(args) {
-    const UPDATE_VERSION = 2;
-    return new Promise(function (fulfill, reject) {
-            if (args.ver < UPDATE_VERSION) {
-                console.log("DB is updating to version " + UPDATE_VERSION);
-                args.db.run(
-                "CREATE TABLE IF NOT EXISTS donates (" +
-                "   pupil INTEGER," +
-                "   summ REAL," +
-                "   date TEXT," +
-                "   FOREIGN KEY(pupil) REFERENCES pupils(rowid)" +
-                ")",
-                    function (err) {
-                        if (err) reject(err);
-                        else {
-                            updateDbVersion({db: args.db, ver: UPDATE_VERSION})
-                                .then(fulfill);
-                        }
-                    });
-            } else {
-                fulfill(args);
-            }
-        }
-    );
-}
-
-
 function updateTo1(args) {
     const UPDATE_VERSION = 1;
     return new Promise(function (fulfill, reject) {
@@ -158,11 +130,70 @@ function updateTo1(args) {
     );
 }
 
+function updateTo2(args) {
+    const UPDATE_VERSION = 2;
+    return new Promise(function (fulfill, reject) {
+        if (args.ver < UPDATE_VERSION) {
+            console.log("DB is updating to version " + UPDATE_VERSION);
+            args.db.run(
+                "CREATE TABLE IF NOT EXISTS donates (" +
+                "   pupil INTEGER," +
+                "   summ REAL," +
+                "   date TEXT," +
+                "   FOREIGN KEY(pupil) REFERENCES pupils(rowid)" +
+                ")",
+                function (err) {
+                    if (err) reject(err);
+                    else {
+                        updateDbVersion({db: args.db, ver: UPDATE_VERSION})
+                            .then(fulfill);
+                    }
+                });
+        } else {
+            fulfill(args);
+        }
+    });
+}
+
+function updateTo3(args) {
+    const UPDATE_VERSION = 3;
+    function cashTab(args) {
+        return new Promise(function (onSuccess, onError) {
+            args.db.run(
+                "CREATE TABLE IF NOT EXISTS cash ( " +
+                "oper_date TEXT, " +
+                "oper_type TEXT, " + // 'I - приход (из донатов), O - расход, должен быть отрицательным (из расходов)
+                "oper_id INTEGER, " + // rowid в соответсвующей операции таблице
+                "oper_sum REAL )",
+                function (err) {
+                    if (err) reject(err);
+                    else onSuccess(args);
+                }
+            );
+        });
+    }
+    return new Promise(function (fulfill, reject) {
+        if (args.ver < UPDATE_VERSION) {
+            console.log("DB is updating to version " + UPDATE_VERSION);
+            cashTab(args)
+                .then(function(args){
+                    updateDbVersion({db: args.db, ver: UPDATE_VERSION})
+                    .then(fulfill)
+                    .catch(reject);
+                })
+                .catch(reject);
+        } else {
+            fulfill(args);
+        }
+    });
+}
+
 function updateDb(db) {
     return new Promise(function (fulfill, reject) {
             getDbVersion(db)
                 .then(updateTo1)
                 .then(updateTo2)
+                .then(updateTo3)
                 .then(function (args) {
                     if (CURRENT_DB_VERSION == dbVerOnStart) {
                         console.log("There is no need to update DB");

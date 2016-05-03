@@ -20,8 +20,21 @@ router.get('/pupilinfo/:rn', function (req, res) {
 });
 
 router.get('/shortlist', function (req, res) {
-    //console.log(req.app.locals.dataCache.pupilsShortList);
     res.status(200).json(req.app.locals.dataCache.pupilsShortList);
+});
+
+router.get('/select2list', function (req, res) {
+    var list = [];
+    var pupils = req.app.locals.dataCache.pupilsShortList;
+    if (pupils.length > 0) {
+        pupils.forEach(function (pupil) {
+            list.push({
+                id:pupil.rn,
+                text:pupil.shortName
+            });
+        });
+    }
+    res.status(200).json(list);
 });
 
 router.post('/updpupil', function (req, res) {
@@ -161,33 +174,6 @@ router.post('/addpupil', function (req, res) {
         }
     )
     ;
-
-/*    var Counter = req.app.locals.dbConnection.model('Counter', countersSchema, 'counters');
-    var Pupil = req.app.locals.dbConnection.model('Pupil', pupilsSchema, 'pupils');
-    var pupil = new Pupil(JSON.parse(req.body.json_string));
-
-    Counter.increment('pupils', function (err, result) {
-        if (err) {
-            console.error('Ошибка сохранения счетчик учеников: ' + err);
-            return;
-        }
-        var nrn = result.seq;
-        pupil.rn = nrn;
-        pupil.save(function (err) {
-            if (err) {
-                next(err);
-            } else {
-                require('../pupils-cache').setShortList(req.app);
-            }
-            res.json(
-                {
-                    "status": err === null ? 'success' : 'error',
-                    "error": err,
-                    "rn": nrn
-                }
-            );
-        });
-    });*/
 });
 
 
