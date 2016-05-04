@@ -3,10 +3,9 @@ html
     head
         title='Родительский комитет'
         link(rel='stylesheet', href='/stylesheets/style.css')
-        link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
-        link(rel='stylesheet', href='/stylesheets/bootstrap-theme.min.css')
-        link(rel='stylesheet', href='/stylesheets/bootstrap-table.min.css')
-        link(rel='stylesheet', href='/stylesheets/select2.min.css')
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css')
+        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css')
+        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css')
     body
         .container-fluid
             .row
@@ -20,7 +19,7 @@ html
                         a.navbar-brand(href="#") Родительский комитет
                     #navbar-inverse.collapse.navbar-collapse
                         ul.nav.navbar-nav
-                            -var menuItems = { 'Главная':'/' , 'Ученики': '/pupils', 'Пожертвования':'/donates', 'Затраты':'/expenses'};
+                            -var menuItems = { 'Главная':'/' , 'Ученики': '/pupils', 'Взносы':'/donates', 'Затраты':'/expenses'};
                             each val, key in menuItems
                                 if pageName === key
                                     li.active: a( href="#")= key
@@ -29,12 +28,11 @@ html
         block content
         script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js')
         script(src='/javascripts/jquery.inputmask.bundle.js')
-        script(src='/javascripts/bootstrap.min.js')
-        // http://bootstrap-table.wenzhixin.net.cn/getting-started/
-        script(src='/javascripts/bootstrap-table.min.js')
-        script(src='/javascripts/bootstrap-table-ru-RU.min.js')
-        script(src='/javascripts/select2.full.min.js')
-        script(src='/javascripts/i18n/ru.js')
+        script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-ru-RU.min.js')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/i18n/ru.js')
 
         script(src='/javascripts/global.js')
         if pageScript

@@ -1,0 +1,41 @@
+/**
+ * Created by igorgo on 03.05.2016.
+ */
+var cashHelper = {};
+
+const INSERT_CASH =
+    "INSERT INTO cash " +
+    "( oper_date, oper_type, oper_id, oper_sum ) " +
+    "VALUES " +
+    "( $oper_date, $oper_type, $oper_id, $oper_sum )";
+
+/**
+ *
+ * @param obj
+ * @param obj.db            - in/out - БД
+ * @param obj.donateId      - in     - id в таблице DONATES
+ * @param obj.donateDate    - in     - дата взноса
+ * @param obj.donateAmount  - in     - сумма взноса
+ * @param obj.cashId        - out    - id добавленной кассовой операции
+ * @returns {Promise} ({db,outId})
+ */
+cashHelper.addFromDonate = function (obj) {
+    return new Promise(function (resolve,reject) {
+        obj.db.run(INSERT_CASH,{
+                $oper_id: obj.donateId,
+                $oper_date: obj.donateDate,
+                $oper_sum: obj.donateAmount,
+                $oper_type: "I"
+            }, function (err) {
+                if (err) reject(err);
+                else {
+                    //noinspection JSUnresolvedVariable
+                    obj.cashId = this.lastID;
+                    resolve(obj);
+                }
+            }
+        );
+    });
+};
+
+module.exports = cashHelper;

@@ -4,116 +4,74 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
+/* Обработчик GET страницы пожертвований. */
 router.get('/', function (req, res) {
-    res.render('donates', {pageName: 'Пожертвования', pageScript: '/javascripts/donates.js'});
+    res.render('donates', {pageName: 'Взносы', pageScript: '/javascripts/donates.js'});
 });
 
+/* REST GET запрос списка должников с суммами */
 router.get('/debtors', function (req, res, next) {
-    var sql = "SELECT " +
-        "  d.pupil as rn, " +
-        "  p.name_last || ' ' || p.name_first as shortName, " +
-        "  sum(d.summ) as debtSumm " +
-        "FROM " +
-        "  donates d," +
-        "  pupils p " +
-        "WHERE " +
-        " d.pupil = p.rowid " +
-        "GROUP BY d.pupil, p.name_last, p.name_first ";
-    req.app.locals.sqliteDbConnection.all(
-        sql,
-        function (err, debts) {
-            if (err) {
-                next(err);
-            } else {
-                debts.sort(function (s1, s2) {
-                    var diff = s2.debtSumm - s1.debtSumm;
-                    if (diff === 0) {
-                        return (s1.shortName).toString().localeCompare((s2.shortName).toString());
-                    } else {
-                        return diff;
-                    }
-                });
-                res.json(debts);
-            }
-        }
-    );
+    var donateHelper = require("../schemas/donate-helper");
+    donateHelper.getDebtorsList({
+            db: req.app.locals.sqliteDbConnection
+        })
+        .then(function (obj) {
+            var debts = obj.debtorsList;
+            debts.sort(function (s1, s2) {
+                var diff = s2.debtSumm - s1.debtSumm;
+                if (diff === 0) {
+                    return (s1.shortName).toString().localeCompare((s2.shortName).toString());
+                } else {
+                    return diff;
+                }
+            });
+            res.json(debts);
+        })
+        .catch(next);
 });
 
+/**
+ * REST POST запрос на добавление взноса
+ * @param .summ  - сумма взноса
+ * @param .date  - дата взноса
+ * @param .pupil - ученик, сделавший взнос
+ */
 router.post("/makedonate", function (req, res, next) {
-    var donateSumm = req.body.summ;
+    var donateAmmount = req.body.summ;
     var donateDate = new Date(req.body.date).yyyymmdd();
     var donatePupil = req.body.pupil;
     var db = req.app.locals.sqliteDbConnection;
-    db.run(
-        "INSERT INTO donates " +
-        "(  pupil, summ, date ) " +
-        "VALUES " +
-        "( $pupil, $summ, $date )",
-        {
-            $pupil: donatePupil,
-            $summ: -donateSumm,
-            $date: donateDate
-        }, function (err) {
-            if (err) next(err);
-            else {
-                db.run(
-                    "INSERT INTO cash " +
-                    "( oper_date, oper_type, oper_id, oper_sum ) " +
-                    "VALUES " +
-                    "( $oper_date, 'I', $oper_id, $oper_sum )",
-                    {
-                        $oper_date: donateDate,
-                        $oper_id: this.lastID,
-                        $oper_sum: donateSumm
-                    },
-                    function (err) {
-                        if (err) next(err);
-                        else res.json(
-                            {
-                                "status": 'success'
-                            }
-                        );
-                    }
-                );
-
-            }
-
-        }
-    );
-});
-router.get('/pupilopers/:pupil', function (req, res) {
-    var sql = "SELECT " +
-        "  d.rowid as id, " +
-        "  d.date as oper_date, " +
-        "  d.summ as oper_summ " +
-        "FROM " +
-        "  donates d," +
-        "  pupils p " +
-        "WHERE " +
-        " d.pupil = p.rowid " +
-        " AND d.pupil = $pupil " +
-        " ORDER BY d.date DESC";
-    var params = {$pupil:req.params.pupil};
-    function cb(err,opers) {
-        if (err) {
-            next(err);
-        } else {
-            if (opers.length > 0) {
-                opers.forEach(function (oper) {
-                    if (oper.oper_summ < 0) {
-                        oper.oper_type = "Взнос";
-                        oper.oper_summ = -oper.oper_summ;
-                    } else {
-                        oper.oper_type = "Начисление";
-                    }
+    var donateHelper = require("../schemas/donate-helper");
+    var cashHelper = require("../schemas/cash-helper");
+    donateHelper.addDonate({
+            db: db,
+            donatePupil: donatePupil,
+            donateDate: donateDate,
+            donateAmount: donateAmmount
+        })
+        .then(cashHelper.addFromDonate)
+        .then(function (obj) {
+            res.json(
+                {
+                    "status": 'success',
+                    "newDonateId": obj.donateId,
+                    "newCashOperId": obj.cashId
                 });
-            }
-            res.status(200).json(opers);
-        }
-    }
-    req.app.locals.sqliteDbConnection.all(sql,params,cb);
+        })
+        .catch(next);
+});
 
+/** REST GET запрос списка операций по должнику
+ *  @param :pupil - ученик-должник
+ */
+router.get('/pupilopers/:pupil', function (req, res, next) {
+    var donateHelper = require("../schemas/donate-helper");
+    donateHelper.getDebtorOperations({
+        db: req.app.locals.sqliteDbConnection,
+        pupilId: req.params.pupil
+    })
+        .then(function(obj){res.status(200).json(obj.opersList)})
+        .catch(next);
 });
 
 router.post('/makedebt', function (req, res, next) {

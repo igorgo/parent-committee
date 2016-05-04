@@ -5,7 +5,7 @@ block content
     #donates-container.container-fluid.page-container
         .row
             .jumbotron
-                h1 Пожертвования
+                h1 Взносы
                 p Чтобы детки хорошо учились, родители должны сдавать денежки!
         .row
             .col-lg-6
@@ -15,30 +15,12 @@ block content
                             h4.panel-title Должники
                         .panel-body
                             .row
-                                table(
-                                id="debtor-table",
-                                data-toggle="table",
-                                data-detail-view="true"
-                                data-url="/donates/debtors",
-                                data-sortable=true,
-                                data-id-field="rn")
-                                    thead
-                                        tr
-                                            th(data-field="shortName", data-halign="center", data-sortable: true) ФИО
-                                            th(
-                                            data-field="debtSumm",
-                                            data-halign="center",
-                                            data-align="right",
-                                            data-formatter="formatCurrency", data-sortable: true) Сумма
-                                            th(
-                                            data-formatter="operationsFormatter",
-                                            data-events="operateEvents"
-                                            data-align="center")
+                                table(id="debtor-table")
             .col-lg-6
                 #donates-right-panel.container-fluid(data-spy="affix" data-offset-top="373" data-offset-bottom="0")
                     .panel.panel-default
                         .panel-heading
-                            h4.panel-title Внесение в кассу
+                            h4.panel-title Добавить взнос
                         #donates-form-donate.panel-body
                             fieldset
                                 .container-fluid
