@@ -77,7 +77,7 @@ router.post('/updpupil', function (req, res) {
             if (err) {
                 next(err);
             } else {
-                require('../pupils-cache').setShortList(req.app);
+                require("./common").cachePupilsShortList(req.app);
             }
             res.json(
                 {
@@ -162,7 +162,7 @@ router.post('/addpupil', function (req, res) {
             if (err) {
                 next(err);
             } else {
-                require('../pupils-cache').setShortList(req.app);
+                require("./common").cachePupilsShortList(req.app);
             }
             res.json(
                 {

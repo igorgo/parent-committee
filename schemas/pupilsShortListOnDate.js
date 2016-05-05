@@ -3,17 +3,34 @@
  */
 function getPupilsShortListOnDate(dbConnection, date, callback) {
 
-    function sortByLastFirstName(s1, s2) {
-        //return s1.shortName.toString().localeCompare(s2.shortName.toString());
-        return (s1.name_last + s1.name_first ).toString().localeCompare((s2.name_last + s2.name_first).toString());
+    var sorter = require("../common").localeCompare;
+
+    /**
+     * Сравнение 2-х учеников для сортировки
+     * @param pipil1
+     * @param pipil1.name_last
+     * @param pipil1.name_first
+     * @param pupil2
+     * @param pupil2.name_last
+     * @param pupil2.name_first
+     * @returns {number}
+     */
+    function sortByLastFirstName(pipil1, pupil2) {
+        return sorter (
+            pipil1.name_last + pipil1.name_first,
+            pupil2.name_last + pupil2.name_first
+        );
     }
+
+
 
     function fillPupilsArray(err, pupils) {
         var pupilsArray = [];
         var rowNo = 0;
         if (pupils.length > 0) {
             var d, ds;
-            pupils.sort(sortByLastFirstName);
+
+            pupils.sort( sortByLastFirstName );
             pupils.forEach(function (pupil) {
                 if (pupil.birthday) {
                 d = new Date(pupil.birthday);

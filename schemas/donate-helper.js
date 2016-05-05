@@ -38,26 +38,26 @@ const SELECT_DONATES_BY_PUPIL =
 /**
  * Добавление записи взноса
  *  - сумма добавляется с отрицательным знаком
- * @param obj
- * @param obj.db           - in  БД
- * @param obj.donatePupil  - in  дата взноса
- * @param obj.donateDate   - in  дата взноса
- * @param obj.donateAmount - in  сумма взноса
- * @param obj.donateId     - out id новой записи в таблице DONATES
+ * @param params
+ * @param params.db           - in  БД
+ * @param params.donatePupil  - in  дата взноса
+ * @param params.donateDate   - in  дата взноса
+ * @param params.donateAmount - in  сумма взноса
+ * @param params.donateId     - out id новой записи в таблице DONATES
  * @returns {Promise} ({db,donateId})
  */
-donateHelper.addDonate = function (obj) {
+donateHelper.addDonate = function (params) {
     return new Promise(function (resolve, reject) {
-        obj.db.run(INSERT_DONATE, {
-                $pupil: obj.donatePupil,
-                $summ: obj.donateAmount*-1,
-                $date: obj.donateDate
+        params.db.run(INSERT_DONATE, {
+                $pupil: params.donatePupil,
+                $summ: params.donateAmount*-1,
+                $date: params.donateDate
             }, function (err) {
                 if (err) reject(err);
                 else {
                     //noinspection JSUnresolvedVariable
-                    obj.donateId = this.lastID;
-                    resolve(obj);
+                    params.donateId = this.lastID;
+                    resolve(params);
                 }
             }
         );
@@ -67,32 +67,32 @@ donateHelper.addDonate = function (obj) {
 /**
  * Возвращает список дожников с суммами на дату
  *  - если дата не указана, то и спользуется текущая
- * @param obj
+ * @param params
  * @returns {Promise}
  *
- * - in params of obj:
- * @param obj.db          - in  БД
- * @param obj.onDate      - in  на какую дату запрашивать
+ * - in params
+ * @param params.db          - in  БД
+ * @param params.onDate      - in  на какую дату запрашивать
  *
- * - out params of obj:
- * @param obj.debtorsList - out массив результатов
+ * - out params
+ * @param params.debtorsList - out массив результатов
  *
  * - поля результата:
- *   - obj.debtorsList.rn - ID ученика
- *   - obj.debtorsList.shortName - Имя, фамилия ученика
- *   - obj.debtorsList.debtSumm  - Сумма долга
+ *   - debtorsList.rn        - ID ученика
+ *   - debtorsList.shortName - Имя, фамилия ученика
+ *   - debtorsList.debtSumm  - Сумма долга
  */
-donateHelper.getDebtorsList = function (obj) {
+donateHelper.getDebtorsList = function (params) {
     return new Promise(function (resolve, reject) {
-        obj.db.all(SELECT_DEBTS_ON_DATE,
+        params.db.all(SELECT_DEBTS_ON_DATE,
             {
-                $onDate: (obj.onDate) ? obj.onDate : (new Date()).yyyymmdd()
+                $onDate: (params.onDate) ? params.onDate : (new Date()).yyyymmdd()
             },
             function (err, records) {
                 if (err) reject(err);
                 else {
-                    obj.debtorsList = records;
-                    resolve(obj);
+                    params.debtorsList = records;
+                    resolve(params);
                 }
         });
     });
@@ -102,28 +102,28 @@ donateHelper.getDebtorsList = function (obj) {
  * Возвращает список операций по должнику на дату
  *   - если дата не указана, то и спользуется текущая
  *   - сумма всегда возвращается положительной
- * @param obj
+ * @param params
  * @returns {Promise}
  *
  * - in params of obj:
- * @param obj.db      - БД
- * @param obj.pupilId - ID ученика должника
- * @param obj.onDate  - на какую дату запрашивать
+ * @param params.db      - БД
+ * @param params.pupilId - ID ученика должника
+ * @param params.onDate  - на какую дату запрашивать
  *
  * - out params of obj:
- * @param obj.opersList - массив результатов
+ * @param params.opersList - массив результатов
  *
  * - поля результата:
- *   - obj.opersList.id        - ID операции
- *   - obj.opersList.oper_summ - сумма операции
- *   - obj.opersList.oper_type - тип операции (Взнос/Начисление)
- *   - obj.opersList.oper_date - дата операции
+ *   - opersList.id        - ID операции
+ *   - opersList.oper_summ - сумма операции
+ *   - opersList.oper_type - тип операции (Взнос/Начисление)
+ *   - opersList.oper_date - дата операции
  */
-donateHelper.getDebtorOperations = function (obj) {
+donateHelper.getDebtorOperations = function (params) {
     return new Promise(function (resolve, reject) {
-        obj.db.all(SELECT_DONATES_BY_PUPIL,{
-            $pupil: obj.pupilId,
-            $onDate: (obj.onDate) ? obj.onDate : (new Date()).yyyymmdd()
+        params.db.all(SELECT_DONATES_BY_PUPIL,{
+            $pupil: params.pupilId,
+            $onDate: (params.onDate) ? params.onDate : (new Date()).yyyymmdd()
         },function (err, records){
             if (err) reject(err);
             else {
@@ -138,11 +138,43 @@ donateHelper.getDebtorOperations = function (obj) {
                         }
                     });
                 }
-                obj.opersList = opers;
-                resolve(obj);
+                params.opersList = opers;
+                resolve(params);
             }
         });
     });
 };
+
+/**
+ * Добавление записи начисления долга
+ *
+ * @param params
+ * @param params.db           - in  БД
+ * @param params.donatePupil  - in  дата взноса
+ * @param params.donateDate   - in  дата взноса
+ * @param params.donateAmount - in  сумма взноса
+ * @param params.donateId     - out id новой записи в таблице DONATES
+ * @returns {Promise} ({db,donateId})
+ */
+donateHelper.addDebt = function (params) {
+
+    return new Promise(function (resolve, reject) {
+        params.db.run(INSERT_DONATE, {
+                $pupil: params.donatePupil,
+                $summ: params.donateAmount,
+                $date: params.donateDate
+            }, function (err) {
+                if (err) reject(err);
+                else {
+                    //noinspection JSUnresolvedVariable
+                    params.donateId = this.lastID;
+                    resolve(params);
+                }
+            }
+        );
+    });
+};
+
+// TODO: Удаление записи
 
 module.exports = donateHelper;

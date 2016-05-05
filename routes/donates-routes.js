@@ -4,12 +4,21 @@
 var express = require('express');
 var router = express.Router();
 
-/* Обработчик GET страницы пожертвований. */
+/**
+ *  Обработчик GET страницы взносов.
+ */
 router.get('/', function (req, res) {
     res.render('donates', {pageName: 'Взносы', pageScript: '/javascripts/donates.js'});
 });
 
-/* REST GET запрос списка должников с суммами */
+/**
+ *  REST GET запрос списка должников с суммами
+ * [{
+ *    rn        - ID ученика
+ *    shortName - Имя, фамилия ученика
+ *    debtSumm  - Сумма долга
+ * }]
+ */
 router.get('/debtors', function (req, res, next) {
     var donateHelper = require("../schemas/donate-helper");
     donateHelper.getDebtorsList({
@@ -31,7 +40,30 @@ router.get('/debtors', function (req, res, next) {
 });
 
 /**
+ * REST GET запрос списка операций по должнику
+ *
+ *  @param pupil - ученик-должник
+ *
+ *  [{
+ *      id        - ID операции
+ *      oper_summ - сумма операции
+ *      oper_type - тип операции (Взнос/Начисление)
+ *      oper_date - дата операции
+ *  }]
+ */
+router.get('/pupilopers/:pupil', function (req, res, next) {
+    var donateHelper = require("../schemas/donate-helper");
+    donateHelper.getDebtorOperations({
+            db: req.app.locals.sqliteDbConnection,
+            pupilId: req.params.pupil
+        })
+        .then(function(obj){res.status(200).json(obj.opersList)})
+        .catch(next);
+});
+
+/**
  * REST POST запрос на добавление взноса
+ *
  * @param .summ  - сумма взноса
  * @param .date  - дата взноса
  * @param .pupil - ученик, сделавший взнос
@@ -61,26 +93,21 @@ router.post("/makedonate", function (req, res, next) {
         .catch(next);
 });
 
-/** REST GET запрос списка операций по должнику
- *  @param :pupil - ученик-должник
+/**
+ * REST POST запрос для массового начисления долга
+ *
+ * @param .summ  - сумма взноса
+ * @param .date  - дата взноса
  */
-router.get('/pupilopers/:pupil', function (req, res, next) {
-    var donateHelper = require("../schemas/donate-helper");
-    donateHelper.getDebtorOperations({
-        db: req.app.locals.sqliteDbConnection,
-        pupilId: req.params.pupil
-    })
-        .then(function(obj){res.status(200).json(obj.opersList)})
-        .catch(next);
-});
-
 router.post('/makedebt', function (req, res, next) {
     var debtSumm = req.body.summ;
     var debtDate = new Date(req.body.date);
-
-    var getPupilsShortListOnDate = require('../schemas/pupilsShortListOnDate');
-
-    function makeDebtAll(pupils) {
+    require('../schemas/pupil-helper').getShortList({
+        db:req.app.locals.sqliteDbConnection,
+        onDate: debtDate.yyyymmdd()
+    }).then(makeDebtAll);
+    function makeDebtAll(params) {
+        var pupils = params.shortList;
         if (pupils.length === 0) {
             res.json(
                 {
@@ -93,20 +120,12 @@ router.post('/makedebt', function (req, res, next) {
         var db = req.app.locals.sqliteDbConnection;
         db.serialize(function () {
             pupils.forEach(function (pupil) {
-                var insError;
-                db.run(
-                    "INSERT INTO donates " +
-                    "(  pupil, summ, date ) " +
-                    "VALUES " +
-                    "( $pupil, $summ, $date )",
-                    {
-                        $pupil: pupil.rn,
-                        $summ: debtSumm,
-                        $date: debtDate.yyyymmdd()
-                    }, function (err) {
-                        if (insError) next(err);
-                    }
-                );
+                require('../schemas/donate-helper').addDebt({
+                    db:db,
+                    donateAmount: debtSumm,
+                    donateDate: debtDate.yyyymmdd(),
+                    donatePupil:  pupil.rn
+                }).catch(next);
             });
         });
         res.json(
@@ -116,9 +135,6 @@ router.post('/makedebt', function (req, res, next) {
         );
         return false;
     }
-
-    getPupilsShortListOnDate(req.app.locals.sqliteDbConnection, debtDate, makeDebtAll);
-
 });
 
 module.exports = router;

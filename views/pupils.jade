@@ -23,7 +23,7 @@ block content
                                     th(data-field="state" data-checkbox="true")
                                     th(data-field="rowno", data-halign="center") №
                                     th(data-field="shortName", data-halign="center") ФИО
-                                    th(data-field="birthdayString", data-halign="center") ДР
+                                    th(data-field="birthday", data-halign="center", data-formatter="d2s") ДР
                     .row(style="margin-top:15px")
                         a#pupil-add-button.btn.btn-default(href='#') Добавить ученика
             include ./pupils-edit.jade

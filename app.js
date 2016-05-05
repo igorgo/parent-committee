@@ -2,14 +2,14 @@ Date.prototype.ddmmyyyy = function () {
     var yyyy = this.getFullYear().toString();
     var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
     var dd = this.getDate().toString();
-    return (dd[1] ? dd : "0" + dd[0]) + "." + (mm[1] ? mm : "0" + mm[0]) + "." + yyyy; // padding
+    return (dd[1] ? dd : "0" + dd[0]) + "." + (mm[1] ? mm : "0" + mm[0]) + "." + yyyy;
 };
 
 Date.prototype.yyyymmdd = function () {
     var yyyy = this.getFullYear().toString();
     var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
     var dd = this.getDate().toString();
-    return yyyy + "-" + (mm[1] ? mm : "0" + mm[0]) + "-" + (dd[1] ? dd : "0" + dd[0]); // padding
+    return yyyy + "-" + (mm[1] ? mm : "0" + mm[0]) + "-" + (dd[1] ? dd : "0" + dd[0]);
 };
 // TODO: Expenses page
 // TODO: Main page
@@ -31,19 +31,14 @@ var updater = require("./schemas/db-updater");
 app.locals.sqliteDbConnection = sqliteDbConnection;
 // массив кэшей
 app.locals.dataCache = {};
-
-// Короткий список действующих учеников в кеш
-
-
 updater(sqliteDbConnection)
-    .then(function (){
-        require('./pupils-cache').setShortList(app);
+    .then(function () {
+        require("./common").cachePupilsShortList(app);
     })
     .catch(function (err) {
         console.error(err);
         process.exit(1);
     });
-
 
 
 // view engine setup
@@ -59,9 +54,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /*app.use(function (req, res, next) {
-    req.dbConnection = dbConnection;
-    next();
-});*/
+ req.dbConnection = dbConnection;
+ next();
+ });*/
 
 app.use('/', routes);
 app.use('/pupils', pupils);
