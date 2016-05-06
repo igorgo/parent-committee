@@ -6,88 +6,147 @@ jQuery(function ($) {
 
     var genders = ['', 'M', 'F'];
     var currentPupil;
-    var needUpdate;
 
-    function clearPupilsiditFields() {
-        $('#pupils-edit-panel fieldset input').val('');
-        $('#inputGender').selectedIndex = 0;
-    }
-
-    function populateDetailPanel() {
-        $("#pupils-detail dd").text("");
-        if (currentPupil) {
+    /**
+     * Вписывание данных в поля информационной панели   
+     * @param pupilInfo
+     * @param pupilInfo.name_last
+     * @param pupilInfo.name_first
+     * @param pupilInfo.name_middle
+     * @param pupilInfo.birthday
+     * @param pupilInfo.email
+     * @param pupilInfo.address_live
+     * @param pupilInfo.address_reg
+     * @param pupilInfo.phone_cell
+     * @param pupilInfo.phone_home
+     * @param pupilInfo.mother_name_last
+     * @param pupilInfo.mother_name_first
+     * @param pupilInfo.mother_name_middle
+     * @param pupilInfo.mother_birthday
+     * @param pupilInfo.mother_phone
+     * @param pupilInfo.mother_email
+     * @param pupilInfo.mother_work_place
+     * @param pupilInfo.mother_work_post
+     * @param pupilInfo.mother_work_phone
+     * @param pupilInfo.father_name_last
+     * @param pupilInfo.father_name_first
+     * @param pupilInfo.father_name_middle
+     * @param pupilInfo.father_birthday
+     * @param pupilInfo.father_phone
+     * @param pupilInfo.father_email
+     * @param pupilInfo.father_work_place
+     * @param pupilInfo.father_work_post
+     * @param pupilInfo.father_work_phone
+     */
+    function populateDetailPanel(pupilInfo) {
+        $("#pupils-detail").find("dd").text("");
+        if (pupilInfo) {
             $("#pupil-upd-button").removeClass("hidden");
-            $('#pupil-last-name').text(currentPupil.name_last);
-            $('#pupil-first-name').text(currentPupil.name_first);
-            $('#pupil-middle-name').text(currentPupil.name_middle);
-            $('#pupil-birthday').text(d2s(currentPupil.birthday));
-            $('#pupil-email').text(currentPupil.email);
-            $('#pupil-home-address').text(currentPupil.address_live);
-            $('#pupil-reg-address').text(currentPupil.address_reg);
-            $('#pupil-cell-phone').text(currentPupil.phone_cell);
-            $('#pupil-home-phone').text(currentPupil.phone_home);
-            $('#mother-last-name').text(currentPupil.mother_name_last);
-            $('#mother-first-name').text(currentPupil.mother_name_first);
-            $('#mother-middle-name').text(currentPupil.mother_name_middle);
-            $('#mother-birthday').text(d2s(currentPupil.mother_birthday));
-            $('#mother-cell-phone').text(currentPupil.mother_phone);
-            $('#mother-email').text(currentPupil.mother_email);
-            $('#mother-work-place').text(currentPupil.mother_work_place);
-            $('#mother-work-post').text(currentPupil.mother_work_post);
-            $('#mother-work-phone').text(currentPupil.mother_work_phone);
-            $('#father-last-name').text(currentPupil.father_name_last);
-            $('#father-first-name').text(currentPupil.father_name_first);
-            $('#father-middle-name').text(currentPupil.father_name_middle);
-            $('#father-birthday').text(d2s(currentPupil.father_birthday));
-            $('#father-cell-phone').text(currentPupil.father_phone);
-            $('#father-email').text(currentPupil.father_email);
-            $('#father-work-place').text(currentPupil.father_work_place);
-            $('#father-work-post').text(currentPupil.father_work_post);
-            $('#father-work-phone').text(currentPupil.father_work_phone);
+            $('#pupil-last-name').text(pupilInfo.name_last);
+            $('#pupil-first-name').text(pupilInfo.name_first);
+            $('#pupil-middle-name').text(pupilInfo.name_middle);
+            $('#pupil-birthday').text(d2s(pupilInfo.birthday));
+            $('#pupil-email').text(pupilInfo.email);
+            $('#pupil-home-address').text(pupilInfo.address_live);
+            $('#pupil-reg-address').text(pupilInfo.address_reg);
+            $('#pupil-cell-phone').text(pupilInfo.phone_cell);
+            $('#pupil-home-phone').text(pupilInfo.phone_home);
+            $('#mother-last-name').text(pupilInfo.mother_name_last);
+            $('#mother-first-name').text(pupilInfo.mother_name_first);
+            $('#mother-middle-name').text(pupilInfo.mother_name_middle);
+            $('#mother-birthday').text(d2s(pupilInfo.mother_birthday));
+            $('#mother-cell-phone').text(pupilInfo.mother_phone);
+            $('#mother-email').text(pupilInfo.mother_email);
+            $('#mother-work-place').text(pupilInfo.mother_work_place);
+            $('#mother-work-post').text(pupilInfo.mother_work_post);
+            $('#mother-work-phone').text(pupilInfo.mother_work_phone);
+            $('#father-last-name').text(pupilInfo.father_name_last);
+            $('#father-first-name').text(pupilInfo.father_name_first);
+            $('#father-middle-name').text(pupilInfo.father_name_middle);
+            $('#father-birthday').text(d2s(pupilInfo.father_birthday));
+            $('#father-cell-phone').text(pupilInfo.father_phone);
+            $('#father-email').text(pupilInfo.father_email);
+            $('#father-work-place').text(pupilInfo.father_work_place);
+            $('#father-work-post').text(pupilInfo.father_work_post);
+            $('#father-work-phone').text(pupilInfo.father_work_phone);
         } else {
             $("#pupil-upd-button").addClass("hidden");
         }
     }
 
-    function populateEditForm() {
-        if (currentPupil) {
-            $('#inputLastName').val(currentPupil.name_last);
-            $('#inputFirstName').val(currentPupil.name_first);
-            $('#inputMiddleName').val(currentPupil.name_middle);
-            $('#inputBirthday').val(currentPupil.birthday);
-            $('#inputGender')[0].selectedIndex = genders.indexOf(currentPupil.gender);
-            $('#inputEmail').val(currentPupil.email);
-            $('#inputLiveAddress').val(currentPupil.address_live);
-            $('#inputRegAddress').val(currentPupil.address_reg);
-            $('#inputCellPhone').val(currentPupil.phone_cell);
-            $('#inputHomePhone').val(currentPupil.phone_home);
-            $('#inputStudyFrom').val(currentPupil.studied_from);
-            $('#inputStudyTill').val(currentPupil.studied_till);
-            $('#inputMotherLastName').val(currentPupil.mother_name_last);
-            $('#inputMotherFirstName').val(currentPupil.mother_name_first);
-            $('#inputMotherMiddleName').val(currentPupil.mother_name_middle);
-            $('#inputMotherBirthday').val(currentPupil.mother_birthday);
-            $('#inputMotherCellPhone').val(currentPupil.mother_phone);
-            $('#inputMotherEmail').val(currentPupil.mother_email);
-            $('#inputMotherWorkplace').val(currentPupil.mother_work_place);
-            $('#inputMotherPost').val(currentPupil.mother_work_post);
-            $('#inputMotherWorkPhone').val(currentPupil.mother_work_phone);
-            $('#inputFatherLastName').val(currentPupil.father_name_last);
-            $('#inputFatherFirstName').val(currentPupil.father_name_first);
-            $('#inputFatherMiddleName').val(currentPupil.father_name_middle);
-            $('#inputFatherBirthday').val(currentPupil.father_birthday);
-            $('#inputFatherCellPhone').val(currentPupil.father_phone);
-            $('#inputFatherEmail').val(currentPupil.father_email);
-            $('#inputFatherWorkplace').val(currentPupil.father_work_place);
-            $('#inputFatherPost').val(currentPupil.father_work_post);
-            $('#inputFatherWorkPhone').val(currentPupil.father_work_phone);
+    /**
+     * Вписывание данных в поля формы редактирования
+     * @param pupilInfo
+     * @param pupilInfo.name_last
+     * @param pupilInfo.name_first
+     * @param pupilInfo.name_middle
+     * @param pupilInfo.birthday
+     * @param pupilInfo.gender
+     * @param pupilInfo.email
+     * @param pupilInfo.address_live
+     * @param pupilInfo.address_reg
+     * @param pupilInfo.phone_cell
+     * @param pupilInfo.phone_home
+     * @param pupilInfo.studied_from
+     * @param pupilInfo.studied_till
+     * @param pupilInfo.mother_name_last
+     * @param pupilInfo.mother_name_first
+     * @param pupilInfo.mother_name_middle
+     * @param pupilInfo.mother_birthday
+     * @param pupilInfo.mother_phone
+     * @param pupilInfo.mother_email
+     * @param pupilInfo.mother_work_place
+     * @param pupilInfo.mother_work_post
+     * @param pupilInfo.mother_work_phone
+     * @param pupilInfo.father_name_last
+     * @param pupilInfo.father_name_first
+     * @param pupilInfo.father_name_middle
+     * @param pupilInfo.father_birthday
+     * @param pupilInfo.father_phone
+     * @param pupilInfo.father_email
+     * @param pupilInfo.father_work_place
+     * @param pupilInfo.father_work_post
+     * @param pupilInfo.father_work_phone
+     */
+    function populateEditForm(pupilInfo) {
+        if (pupilInfo) {
+            $('#inputLastName').val(pupilInfo.name_last);
+            $('#inputFirstName').val(pupilInfo.name_first);
+            $('#inputMiddleName').val(pupilInfo.name_middle);
+            $('#inputBirthday').val(pupilInfo.birthday);
+            $('#inputGender')[0].selectedIndex = genders.indexOf(pupilInfo.gender);
+            $('#inputEmail').val(pupilInfo.email);
+            $('#inputLiveAddress').val(pupilInfo.address_live);
+            $('#inputRegAddress').val(pupilInfo.address_reg);
+            $('#inputCellPhone').val(pupilInfo.phone_cell);
+            $('#inputHomePhone').val(pupilInfo.phone_home);
+            $('#inputStudyFrom').val(pupilInfo.studied_from);
+            $('#inputStudyTill').val(pupilInfo.studied_till);
+            $('#inputMotherLastName').val(pupilInfo.mother_name_last);
+            $('#inputMotherFirstName').val(pupilInfo.mother_name_first);
+            $('#inputMotherMiddleName').val(pupilInfo.mother_name_middle);
+            $('#inputMotherBirthday').val(pupilInfo.mother_birthday);
+            $('#inputMotherCellPhone').val(pupilInfo.mother_phone);
+            $('#inputMotherEmail').val(pupilInfo.mother_email);
+            $('#inputMotherWorkplace').val(pupilInfo.mother_work_place);
+            $('#inputMotherPost').val(pupilInfo.mother_work_post);
+            $('#inputMotherWorkPhone').val(pupilInfo.mother_work_phone);
+            $('#inputFatherLastName').val(pupilInfo.father_name_last);
+            $('#inputFatherFirstName').val(pupilInfo.father_name_first);
+            $('#inputFatherMiddleName').val(pupilInfo.father_name_middle);
+            $('#inputFatherBirthday').val(pupilInfo.father_birthday);
+            $('#inputFatherCellPhone').val(pupilInfo.father_phone);
+            $('#inputFatherEmail').val(pupilInfo.father_email);
+            $('#inputFatherWorkplace').val(pupilInfo.father_work_place);
+            $('#inputFatherPost').val(pupilInfo.father_work_post);
+            $('#inputFatherWorkPhone').val(pupilInfo.father_work_phone);
         }
     }
 
     function getPupilInfo(pupilRn) {
         $.getJSON('/pupils/pupilinfo/' + pupilRn, function (data) {
             currentPupil = data;
-            populateDetailPanel();
+            populateDetailPanel(data);
         });
     }
 
@@ -110,7 +169,6 @@ jQuery(function ($) {
         return true;
     }
 
-
     function assemblePupil() {
         var lastName = $('#inputLastName').val();
         var firstName = $('#inputFirstName').val();
@@ -118,12 +176,10 @@ jQuery(function ($) {
         function es(s) {
             if (s) {
                 return s;
-            } else {
-                return;
             }
         }
 
-        var pupil = new Object();
+        var pupil = {};
         pupil.$name_first = firstName;
         pupil.$name_middle = es($('#inputMiddleName').val());
         pupil.$name_last = lastName;
@@ -178,14 +234,8 @@ jQuery(function ($) {
     }
 
     function finishEdit(response) {
-        var msg = response;
-        if (msg.status === 'success') {
             hideEditPanel();
-            getPupilInfo(msg.rn);
-        }
-        else {
-            alert('Error:' + msg.error);
-        }
+            getPupilInfo(response.pupilId);
     }
 
 // Your jQuery code here, using the $
@@ -198,7 +248,7 @@ jQuery(function ($) {
         $("#pupil-upd-button").on("click", function (event) {
             event.preventDefault();
             showEditPanel("u");
-            populateEditForm();
+            populateEditForm(currentPupil);
         });
 
         $("#pupil-add-do-button").on("click", function (event) {
@@ -210,7 +260,7 @@ jQuery(function ($) {
                 $.ajax({
                     type: 'POST',
                     //data: pupil,
-                    data: {json_string: JSON.stringify(pupil)},
+                    data: {pipilData: JSON.stringify(pupil)},
                     url: '/pupils/addpupil',
                     dataType: 'JSON'
                 }).done(finishEdit);
@@ -223,12 +273,13 @@ jQuery(function ($) {
 
             if (validatePupil()) {
                 var pupil = assemblePupil();
+                //noinspection JSUnresolvedVariable
                 pupil.$rn = currentPupil.rowid;
                 // Ajax to post the object to our adduser service
                 $.ajax({
                     type: 'POST',
                     //data: pupil,
-                    data: {json_string: JSON.stringify(pupil)},
+                    data: {pipilData: JSON.stringify(pupil)},
                     url: '/pupils/updpupil',
                     dataType: 'JSON'
                 }).done(finishEdit);
@@ -255,5 +306,4 @@ jQuery(function ($) {
             a.target.style.width = "";
         });
     });
-})
-;
+});

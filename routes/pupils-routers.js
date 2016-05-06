@@ -4,177 +4,101 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', renderPage);
+router.get('/pupilinfo/:rn', getPupilInfo);
+router.get('/shortlist', getPupilsShortList);
+router.get('/select2list', getSelect2PupilsList);
+router.post('/updpupil', updatePupil);
+router.post('/addpupil', addPupil);
+
+/**
+ * GET /pupils/ рендеринг страницы "Ученики".
+ */
+function renderPage (ignore, res) {
     res.render('pupils', {pageName: 'Ученики', pageScript: '/javascripts/pupils.js'});
-});
+}
 
-router.get('/pupilinfo/:rn', function (req, res) {
-    req.app.locals.sqliteDbConnection.get(
-        "SELECT rowid, * FROM pupils WHERE rowid = $rn", {$rn: req.params.rn}, function (err, pupil) {
-            if (err)
-                res.send(err);
-            res.json(pupil);
-        }
-    );
-});
+/**
+ * REST GET /pupils/pupilinfo/:rn - возвращает полную информацию по ученику rn
+ */
+function getPupilInfo (req, res, next) {
+    require("../schemas/pupil-helper").getPupilById({
+            db: req.app.locals.sqliteDbConnection,
+            pupilId: req.params.rn,
+            pupilInfo: {} //returns
+        })
+        .then(function (params) {
+            res.status(200).json(params.pupilInfo);
+        })
+        .catch(next);
+}
 
-router.get('/shortlist', function (req, res) {
+/**
+ * REST GET /pupils/shortlist/ - возвращает краткий список учеников на текущую дату
+ * - результаты берутся из кеша
+ */
+function getPupilsShortList(req, res) {
     res.status(200).json(req.app.locals.dataCache.pupilsShortList);
-});
+}
 
-router.get('/select2list', function (req, res) {
+/**
+ * REST GET /pupils/select2list/ - возвращает список учеников для комбо select2
+ * - результаты берутся из кеша
+ * - возвращается массив пар значений id (rowid) и text (фамилия + имя)
+ */
+function getSelect2PupilsList (req, res) {
     var list = [];
     var pupils = req.app.locals.dataCache.pupilsShortList;
     if (pupils.length > 0) {
         pupils.forEach(function (pupil) {
             list.push({
-                id:pupil.rn,
-                text:pupil.shortName
+                id: pupil.rn,
+                text: pupil.shortName
             });
         });
     }
     res.status(200).json(list);
-});
+}
 
-router.post('/updpupil', function (req, res) {
-    var curPupil = JSON.parse(req.body.json_string);
-    req.app.locals.sqliteDbConnection.run(
-        "UPDATE pupils SET " +
-        "   name_first = $name_first," +
-        "   name_middle = $name_middle," +
-        "   name_last = $name_last," +
-        "   birthday = $birthday," +
-        "   gender = $gender," +
-        "   email = $email," +
-        "   address_live = $address_live," +
-        "   address_reg = $address_reg," +
-        "   phone_home = $phone_home," +
-        "   phone_cell = $phone_cell," +
-        "   studied_from = $studied_from," +
-        "   studied_till = $studied_till," +
-        "   mother_name_first = $mother_name_first," +
-        "   mother_name_middle = $mother_name_middle," +
-        "   mother_name_last = $mother_name_last," +
-        "   mother_birthday = $mother_birthday," +
-        "   mother_email = $mother_email," +
-        "   mother_phone = $mother_phone," +
-        "   mother_work_place = $mother_work_place," +
-        "   mother_work_post = $mother_work_post," +
-        "   mother_work_phone = $mother_work_phone," +
-        "   father_name_first = $father_name_first," +
-        "   father_name_middle = $father_name_middle," +
-        "   father_name_last = $father_name_last," +
-        "   father_birthday = $father_birthday," +
-        "   father_email = $father_email," +
-        "   father_phone = $father_phone," +
-        "   father_work_place = $father_work_place," +
-        "   father_work_post = $father_work_post," +
-        "   father_work_phone =$father_work_phone" +
-        " WHERE rowid = $rn",
-        curPupil,
-        function (err) {
-            if (err) {
-                next(err);
-            } else {
-                require("./common").cachePupilsShortList(req.app);
-            }
-            res.json(
-                {
-                    "status": err === null ? 'success' : 'error',
-                    "error": err,
-                    "rn": curPupil.$rn
-                }
-            );
-        }
-    );
+/**
+ * REST POST /updpupil/ Исправление ученика
+ * @param req
+ * @param req.app - Express app
+ * @param req.body.pipilData - объект с инфой ученика
+ * @param res
+ * @param next
+ */
+function updatePupil (req, res, next) {
+    require("../schemas/pupil-helper").updatePupil({
+            db: req.app.locals.sqliteDbConnection,
+            pupilData: JSON.parse(req.body.pipilData)
+        })
+        .then(function (params) {
+            require("../common").cachePupilsShortList(req.app);
+            res.status(200).json({pupilId: params.pupilData.$rn});
+        })
+        .catch(next);
+}
 
-});
-
-router.post('/addpupil', function (req, res) {
-    var pupil = JSON.parse(req.body.json_string);
-    req.app.locals.sqliteDbConnection.run(
-        "INSERT INTO pupils (" +
-        "   name_first," +
-        "   name_middle," +
-        "   name_last," +
-        "   birthday," +
-        "   gender," +
-        "   email," +
-        "   address_live," +
-        "   address_reg," +
-        "   phone_home," +
-        "   phone_cell," +
-        "   studied_from," +
-        "   studied_till," +
-        "   mother_name_first," +
-        "   mother_name_middle," +
-        "   mother_name_last," +
-        "   mother_birthday," +
-        "   mother_email," +
-        "   mother_phone," +
-        "   mother_work_place," +
-        "   mother_work_post," +
-        "   mother_work_phone," +
-        "   father_name_first," +
-        "   father_name_middle," +
-        "   father_name_last," +
-        "   father_birthday," +
-        "   father_email," +
-        "   father_phone," +
-        "   father_work_place," +
-        "   father_work_post," +
-        "   father_work_phone" +
-        ") VALUES ( " +
-        "   $name_first," +
-        "   $name_middle," +
-        "   $name_last," +
-        "   $birthday," +
-        "   $gender," +
-        "   $email," +
-        "   $address_live," +
-        "   $address_reg," +
-        "   $phone_home," +
-        "   $phone_cell," +
-        "   $studied_from," +
-        "   $studied_till," +
-        "   $mother_name_first," +
-        "   $mother_name_middle," +
-        "   $mother_name_last," +
-        "   $mother_birthday," +
-        "   $mother_email," +
-        "   $mother_phone," +
-        "   $mother_work_place," +
-        "   $mother_work_post," +
-        "   $mother_work_phone," +
-        "   $father_name_first," +
-        "   $father_name_middle," +
-        "   $father_name_last," +
-        "   $father_birthday," +
-        "   $father_email," +
-        "   $father_phone," +
-        "   $father_work_place," +
-        "   $father_work_post," +
-        "   $father_work_phone" +
-        ")",
-        pupil,
-        function (err) {
-            if (err) {
-                next(err);
-            } else {
-                require("./common").cachePupilsShortList(req.app);
-            }
-            res.json(
-                {
-                    "status": err === null ? 'success' : 'error',
-                    "error": err,
-                    "rn": this.lastID
-                }
-            );
-        }
-    )
-    ;
-});
-
+/**
+ * REST POST /addpupil/ Добавление ученика
+ * @param req
+ * @param req.app - Express app
+ * @param req.body.pipilData - объект с инфой ученика
+ * @param res
+ * @param next
+ */
+function addPupil(req, res, next) {
+    require("../schemas/pupil-helper").insertPupil({
+            db: req.app.locals.sqliteDbConnection,
+            pupilData: JSON.parse(req.body.pipilData),
+            pupilId: null // returns
+        })
+        .then(function (params) {
+            require("../common").cachePupilsShortList(req.app);
+            res.status(200).json({pupilId: params.pupilId});
+        })
+        .catch(next);
+}
 
 module.exports = router;

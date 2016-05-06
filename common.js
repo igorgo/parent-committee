@@ -13,7 +13,11 @@
 function localeCompare(s1, s2) {
     return s1.toString().localeCompare(s2.toString());
 }
-
+/**
+ * Получение и сортировка с учетом локали краткого списка учеников
+ * @param params
+ * @returns {Promise}
+ */
 function getSortedPupilShortList (params) {
     var helper = require("./schemas/pupil-helper");
     return new Promise(function (resolve, reject) {
@@ -34,6 +38,10 @@ function getSortedPupilShortList (params) {
     });
 }
 
+/**
+ * добавление/обновление кэша короткого списка учеников
+ * @param app
+ */
 function cachePupilsShortList (app) {
     getSortedPupilShortList({db:app.locals.sqliteDbConnection})
         .then(function (parameters) {
