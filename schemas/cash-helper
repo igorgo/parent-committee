@@ -8,31 +8,61 @@ const INSERT_CASH =
     "( oper_date, oper_type, oper_id, oper_sum ) " +
     "VALUES " +
     "( $oper_date, $oper_type, $oper_id, $oper_sum )";
+const DELETE_INCOME_BY_TYPE_AND_ID =
+    " DELETE " +
+    " FROM " +
+    "   cash " +
+    " WHERE " +
+    "      oper_type = $operType " +
+    "  and oper_id   = $operId ";
 
 /**
- *
- * @param obj
- * @param obj.db            - in/out - БД
- * @param obj.donateId      - in     - id в таблице DONATES
- * @param obj.donateDate    - in     - дата взноса
- * @param obj.donateAmount  - in     - сумма взноса
- * @param obj.cashId        - out    - id добавленной кассовой операции
+ * Добавление прихода в кассу (из взносов)
+ * @param params
+ * @param params.db            - in/out - БД
+ * @param params.donateId      - in     - id в таблице DONATES
+ * @param params.donateDate    - in     - дата взноса
+ * @param params.donateAmount  - in     - сумма взноса
+ * @param params.cashId        - out    - id добавленной кассовой операции
  * @returns {Promise} ({db,outId})
  */
-cashHelper.addFromDonate = function (obj) {
+cashHelper.addFromDonate = function (params) {
     return new Promise(function (resolve,reject) {
-        obj.db.run(INSERT_CASH,{
-                $oper_id: obj.donateId,
-                $oper_date: obj.donateDate,
-                $oper_sum: obj.donateAmount,
+        params.db.run(INSERT_CASH,{
+                $oper_id: params.donateId,
+                $oper_date: params.donateDate,
+                $oper_sum: params.donateAmount,
                 $oper_type: "I"
             }, function (err) {
                 if (err) reject(err);
                 else {
                     //noinspection JSUnresolvedVariable
-                    obj.cashId = this.lastID;
-                    resolve(obj);
+                    params.cashId = this.lastID;
+                    resolve(params);
                 }
+            }
+        );
+    });
+};
+
+/**
+ * Удаление прихода (из взносов)
+ * @param params
+ * @param params.db
+ * @param params.operId - id взноса
+ * @returns {Promise}
+ */
+cashHelper.delFromDonate = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.run(
+            DELETE_INCOME_BY_TYPE_AND_ID,
+            {
+                $operId : params.operId,
+                $operType: 'I'
+            },
+            function(err) {
+                if (err) reject(err);
+                else (resolve(params));
             }
         );
     });

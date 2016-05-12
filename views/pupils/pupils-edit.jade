@@ -1,24 +1,25 @@
 //
    Created by igorgo on 19.04.2016.
+include ../mixins/form-input-mixin
 #pupils-edit-panel.panel.panel-default.col-lg-6.hidden
     .panel-body
-        form(id="pupils-edit-form", class="form-horizontal")
+        form#pupils-edit-form
             fieldset
                 legend Ученик
                 .container-fluid
                     .row
                         .container-fluid.col-lg-6
                             .row
-                                +labeledTextEdit("inputLastName","Фамилия",4,8)
+                                +labeledTextEdit("inputLastName","Фамилия",4,8)(required)
                             .row
-                                +labeledTextEdit("inputFirstName","Имя",4,8)
+                                +labeledTextEdit("inputFirstName","Имя",4,8)(required)
                             .row
                                 +labeledTextEdit("inputMiddleName","Отчество",4,8)
                         .container-fluid.col-lg-6
                             .row
                                 +labeledDateEdit("inputBirthday","Дата рождения",4,8)
                             .row
-                                +labeledSelectEdit("inputGender", "Пол", 4, 8, ['', 'Мужской', 'Женский'])
+                                +labeledSelectEdit("inputGender", "Пол", 4, 8, ['', 'Мужской', 'Женский'])(required)
                             .row
                                 +labeledEmailEdit("inputEmail","E-mail",4,8)
                     .row
@@ -30,18 +31,22 @@
                             .row
                                 +glyphEdit('inputRegAddress','Адрес регистрации', 12, 'link')
                     .row
-                        .container-fluid
+                        .container-fluid.form-horizontal
                             .row
                                 label(class="control-label") Телефон
                             .row
-                                +labeledPhoneEdit('inputHomePhone','Домашний', 2, 4, 'phone-alt')
-                                +labeledPhoneEdit('inputCellPhone','Мобильный',2, 4, 'phone')
+                                //+labeledPhoneEdit('inputHomePhone','Домашний', 2, 4, 'phone-alt')
+                                //+labeledPhoneEdit('inputCellPhone','Мобильный',2, 4, 'phone')
+                                .col-lg-6
+                                    +inputPhoneLblH('inputHomePhone',"",'Домашний','phone-alt',4)
+                                .col-lg-6
+                                    +inputPhoneLblH('inputCellPhone',"",'Мобильный','phone',4)
                     .row
                         .container-fluid
                             .row
                                 label(class="control-label") Период обучения
                             .row
-                                +labeledDateEdit("inputStudyFrom","c",2,4)
+                                +labeledDateEdit("inputStudyFrom","c",2,4)(required)
                                 +labeledDateEdit("inputStudyTill","по",2,4)
             +toggledFieldset(true,'mother-inputs','Мама')
                 .row
@@ -91,6 +96,15 @@
                     +labeledPhoneEdit('inputFatherWorkPhone','Рабочий', 2, 4, 'phone-alt')
             .container-fluid(style="margin-top:15px")
                 .row
-                    button(type="reset" id="pupil-add-cancel-button" class="btn btn-default pull-right") Отмена
-                    a(href='#', class="btn btn-default pull-right", id="pupil-add-do-button" style="margin-right:15px") Добавить
-                    a(href='#', class="btn btn-default pull-right", id="pupil-upd-do-button" style="margin-right:15px") Исправить
+                    a#pupil-del-do-button.btn.btn-danger.pull-left(href='',style="margin-right:15px", data-toggle="modal" data-target="#confirm-delete")
+                        span.glyphicon.glyphicon-trash(aria-hidden="true", style="margin-right:8px")
+                        span Удалить ученика
+                    a#pupil-add-cancel-button.btn.btn-primary.pull-right(href='')
+                        span.glyphicon.glyphicon-ban-circle(aria-hidden="true", style="margin-right:8px")
+                        span Отмена
+                    a#pupil-add-do-button.btn.btn-primary.pull-right(href='', style="margin-right:15px")
+                        span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
+                        span Добавить
+                    a#pupil-upd-do-button.btn.btn-primary.pull-right(href='#', style="margin-right:15px")
+                        span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
+                        span Исправить

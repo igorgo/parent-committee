@@ -1,0 +1,39 @@
+extends ../layout
+include ../mixins/form-mixins
+
+block content
+    include pupils-confirm-delete-dialog
+    include pupils-form-modal
+    #pupils-container.container-fluid
+        .row
+            .col-lg-6
+                .panel.panel-default
+                    .panel-body
+                        table.table-condensed(
+                        id="pupils-table",
+                        data-toggle="table",
+                        data-url="/pupils/shortlist",
+                        data-click-to-select="true",
+                        data-single-select="true",
+                        data-pagination="true",
+                        data-page-size=16,
+                        data-page-list=[10,12,15,16,20,25,50],
+                        data-id-field="rn")
+                            thead
+                                tr
+                                    th(data-field="state" data-checkbox="true")
+                                    th(data-field="rowno", data-halign="center") №
+                                    th(data-field="shortName", data-halign="center") ФИО
+                                    th(data-field="birthday", data-halign="center", data-formatter="d2s") ДР
+                    .panel-footer
+                        .row
+                            .col-lg-12.text-center
+                                a#pupil-add-button.btn.btn-success(href='#')
+                                    span.glyphicon.glyphicon-plus(aria-hidden="true", style="margin-right:8px")
+                                    span Новый ученик
+                    #table-cover.cover.hidden
+            //include pupils-edit
+            .col-lg-6
+                include pupils-info
+
+

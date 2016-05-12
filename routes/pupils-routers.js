@@ -5,26 +5,28 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', renderPage);
-router.get('/pupilinfo/:rn', getPupilInfo);
+router.get('/pupilinfo/:id', getPupilInfo);
 router.get('/shortlist', getPupilsShortList);
 router.get('/select2list', getSelect2PupilsList);
 router.post('/updpupil', updatePupil);
 router.post('/addpupil', addPupil);
+//noinspection JSUnresolvedFunction
+router.delete('/delpupil/:id', delPupil);
 
 /**
  * GET /pupils/ рендеринг страницы "Ученики".
  */
-function renderPage (ignore, res) {
-    res.render('pupils', {pageName: 'Ученики', pageScript: '/javascripts/pupils.js'});
+function renderPage(ignore, res) {
+    res.render('pupils/pupils', {pageName: 'Ученики', pageScript: '/javascripts/pupils.js'});
 }
 
 /**
- * REST GET /pupils/pupilinfo/:rn - возвращает полную информацию по ученику rn
+ * REST GET /pupils/pupilinfo/:id - возвращает полную информацию по ученику id
  */
-function getPupilInfo (req, res, next) {
+function getPupilInfo(req, res, next) {
     require("../schemas/pupil-helper").getPupilById({
             db: req.app.locals.sqliteDbConnection,
-            pupilId: req.params.rn,
+            pupilId: req.params.id,
             pupilInfo: {} //returns
         })
         .then(function (params) {
@@ -46,7 +48,7 @@ function getPupilsShortList(req, res) {
  * - результаты берутся из кеша
  * - возвращается массив пар значений id (rowid) и text (фамилия + имя)
  */
-function getSelect2PupilsList (req, res) {
+function getSelect2PupilsList(req, res) {
     var list = [];
     var pupils = req.app.locals.dataCache.pupilsShortList;
     if (pupils.length > 0) {
@@ -68,7 +70,7 @@ function getSelect2PupilsList (req, res) {
  * @param res
  * @param next
  */
-function updatePupil (req, res, next) {
+function updatePupil(req, res, next) {
     require("../schemas/pupil-helper").updatePupil({
             db: req.app.locals.sqliteDbConnection,
             pupilData: JSON.parse(req.body.pipilData)
@@ -101,4 +103,21 @@ function addPupil(req, res, next) {
         .catch(next);
 }
 
+/**
+ * REST DELETE /pupils/delpupil/:id - Удаление ученика из БД
+ * @param req
+ * @param res
+ * @param next
+ */
+function delPupil(req, res, next) {
+    require("../schemas/pupil-helper").deletePupil({
+            db: req.app.locals.sqliteDbConnection,
+            pupilId: req.params.id
+        })
+        .then(function(){
+            require("../common").cachePupilsShortList(req.app);
+            res.status(200).end();
+        })
+        .catch(next);
+}
 module.exports = router;

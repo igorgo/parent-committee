@@ -4,22 +4,30 @@
 var express = require('express');
 var router = express.Router();
 
-/**
- *  Обработчик GET страницы взносов.
- */
-router.get('/', function (req, res) {
-    res.render('donates', {pageName: 'Взносы', pageScript: '/javascripts/donates.js'});
-});
+router.get('/', renderPage);
+router.get('/debtors', getDebtorsList);
+router.get('/pupilopers/:pupil', getPupilOpers);
+router.post("/makedonate", addDonate);
+router.post('/makedebt', addMassDebt);
+//noinspection JSUnresolvedFunction
+router.delete('/deldonate/:id', delOper);
+
 
 /**
- *  REST GET запрос списка должников с суммами
- * [{
- *    rn        - ID ученика
- *    shortName - Имя, фамилия ученика
- *    debtSumm  - Сумма долга
- * }]
+ *  Обработчик GET /donates/ страницы взносов.
  */
-router.get('/debtors', function (req, res, next) {
+function renderPage(ignore, res) {
+    res.render('donates/donates', {pageName: 'Взносы', pageScript: '/javascripts/donates.js'});
+}
+
+/**
+ * REST GET /donates/debtors/ запрос списка должников с суммами
+ * @param req
+ * @param req.app
+ * @param res
+ * @param next
+ */
+function getDebtorsList(req, res, next) {
     var donateHelper = require("../schemas/donate-helper");
     donateHelper.getDebtorsList({
             db: req.app.locals.sqliteDbConnection
@@ -37,38 +45,39 @@ router.get('/debtors', function (req, res, next) {
             res.json(debts);
         })
         .catch(next);
-});
+}
 
 /**
- * REST GET запрос списка операций по должнику
- *
- *  @param pupil - ученик-должник
- *
- *  [{
- *      id        - ID операции
- *      oper_summ - сумма операции
- *      oper_type - тип операции (Взнос/Начисление)
- *      oper_date - дата операции
- *  }]
+ * REST GET /donates/pupilopers/:pupil запрос списка операций по должнику
+ * @param req
+ * @param req.app
+ * @param req.params.pupil - id ученика
+ * @param res
+ * @param next
  */
-router.get('/pupilopers/:pupil', function (req, res, next) {
+function getPupilOpers(req, res, next) {
     var donateHelper = require("../schemas/donate-helper");
     donateHelper.getDebtorOperations({
             db: req.app.locals.sqliteDbConnection,
             pupilId: req.params.pupil
         })
-        .then(function(obj){res.status(200).json(obj.opersList)})
+        .then(function (params) {
+            res.status(200).json(params.opersList)
+        })
         .catch(next);
-});
+}
 
 /**
- * REST POST запрос на добавление взноса
- *
- * @param .summ  - сумма взноса
- * @param .date  - дата взноса
- * @param .pupil - ученик, сделавший взнос
+ * REST POST /donates/makedonate/ запрос на добавление взноса
+ * @param req
+ * @param req.app
+ * @param req.body.summ
+ * @param req.body.date
+ * @param req.body.pupil
+ * @param res
+ * @param next
  */
-router.post("/makedonate", function (req, res, next) {
+function addDonate(req, res, next) {
     var donateAmmount = req.body.summ;
     var donateDate = new Date(req.body.date).yyyymmdd();
     var donatePupil = req.body.pupil;
@@ -83,29 +92,32 @@ router.post("/makedonate", function (req, res, next) {
         })
         .then(cashHelper.addFromDonate)
         .then(function (obj) {
-            res.json(
+            res.status(200).json(
                 {
-                    "status": 'success',
                     "newDonateId": obj.donateId,
                     "newCashOperId": obj.cashId
                 });
         })
         .catch(next);
-});
+}
 
 /**
- * REST POST запрос для массового начисления долга
- *
- * @param .summ  - сумма взноса
- * @param .date  - дата взноса
+ * REST POST /donates/makedebt/ запрос для массового начисления долга
+ * @param req
+ * @param req.app
+ * @param req.body.summ - сумма взноса
+ * @param req.body.date - дата взноса
+ * @param res
+ * @param next
  */
-router.post('/makedebt', function (req, res, next) {
+function addMassDebt(req, res, next) {
     var debtSumm = req.body.summ;
     var debtDate = new Date(req.body.date);
     require('../schemas/pupil-helper').getShortList({
-        db:req.app.locals.sqliteDbConnection,
+        db: req.app.locals.sqliteDbConnection,
         onDate: debtDate.yyyymmdd()
     }).then(makeDebtAll);
+
     function makeDebtAll(params) {
         var pupils = params.shortList;
         if (pupils.length === 0) {
@@ -121,10 +133,10 @@ router.post('/makedebt', function (req, res, next) {
         db.serialize(function () {
             pupils.forEach(function (pupil) {
                 require('../schemas/donate-helper').addDebt({
-                    db:db,
+                    db: db,
                     donateAmount: debtSumm,
                     donateDate: debtDate.yyyymmdd(),
-                    donatePupil:  pupil.rn
+                    donatePupil: pupil.rn
                 }).catch(next);
             });
         });
@@ -135,6 +147,25 @@ router.post('/makedebt', function (req, res, next) {
         );
         return false;
     }
-});
+}
 
+/**
+ * REST DELETE /donates/deldonate/:id запрос для удаления операции взноса/начисления
+ * @param req
+ * @param req.app
+ * @param req.params.id - id операции (взноса/начисления
+ * @param res
+ * @param next
+ */
+function delOper(req, res, next) {
+    require("../schemas/donate-helper").delOper({
+            db: req.app.locals.sqliteDbConnection,
+            operId: req.params.id
+        })
+        .then(require("../schemas/cash-helper").delFromDonate)
+        .then(function () {
+            res.status(200).end();
+        })
+        .catch(next);
+}
 module.exports = router;

@@ -5,42 +5,105 @@
 jQuery(function ($) {
 
     var genders = ['', 'M', 'F'];
-    var currentPupil;
+    var currentPupil,editedPupilId;
+
+    $(function () {
+        $("#pupil-add-button").on("click", function (event) {
+            event.preventDefault();
+            clearEditPanel();
+            showEditPanel("a");
+        });
+
+        $("#pupil-upd-button").on("click", function (event) {
+            event.preventDefault();
+            //noinspection JSUnresolvedVariable
+            editedPupilId = currentPupil.rowid;
+            clearEditPanel();
+            populateEditForm(currentPupil);
+            showEditPanel("u");
+        });
+
+        $("#pupil-add-do-button").on("click", function (event) {
+            event.preventDefault();
+            var f = $("#pupils-edit-form");
+            f.validator('validate');
+            if (f.find(".has-error").length > 0)return;
+            var pupil = assemblePupil();
+            // Ajax to post the object to our adduser service
+            $.ajax({
+                type: 'POST',
+                //data: pupil,
+                data: {pipilData: JSON.stringify(pupil)},
+                url: '/pupils/addpupil',
+                dataType: 'JSON'
+            }).done(finishEdit);
+        });
+
+
+        $("#pupil-upd-do-button").on("click", function (event) {
+            event.preventDefault();
+            var f = $("#pupils-edit-form");
+            f.validator('validate');
+            if (f.find(".has-error").length > 0)return;
+            var pupil = assemblePupil();
+            pupil.$rn = editedPupilId;
+            // Ajax to post the object to our adduser service
+            $.ajax({
+                type: 'POST',
+                //data: pupil,
+                data: {pipilData: JSON.stringify(pupil)},
+                url: '/pupils/updpupil',
+                dataType: 'JSON'
+            }).done(finishEdit);
+        });
+
+        $("#pupil-add-cancel-button").on("click", function (event) {
+            event.preventDefault();
+            $("#pupils-edit-form").validator('destroy');
+            hideEditPanel(false);
+        });
+
+        var pt = $('#pupils-table');
+        pt.on('check.bs.table', function (row, $element) {
+            getPupilInfo($element.rn);
+        });
+
+        pt.on('uncheck.bs.table', function () {
+            populateDetailPanel(undefined);
+        });
+
+        $('#pupil-del-conf-button').on('click', function() {
+            $.ajax({
+                type: 'DELETE',
+                //data: pupil,
+                url: '/pupils/delpupil/' + editedPupilId
+            }).done(function(){
+                $("#confirm-delete").modal('hide');
+                hideEditPanel(true);
+            });
+        });
+
+        var detailPanel = $('#pupils-detail');
+        detailPanel.on('affix.bs.affix', function (a) {
+            var cv = a.target.clientWidth + 2;
+            a.target.style.width = cv + "px";
+        });
+
+        detailPanel.on('affix-top.bs.affix', function (a) {
+            //console.info('affix-top.bs.affix');
+            a.target.style.width = "";
+        });
+    });
 
     /**
      * Вписывание данных в поля информационной панели   
-     * @param pupilInfo
-     * @param pupilInfo.name_last
-     * @param pupilInfo.name_first
-     * @param pupilInfo.name_middle
-     * @param pupilInfo.birthday
-     * @param pupilInfo.email
-     * @param pupilInfo.address_live
-     * @param pupilInfo.address_reg
-     * @param pupilInfo.phone_cell
-     * @param pupilInfo.phone_home
-     * @param pupilInfo.mother_name_last
-     * @param pupilInfo.mother_name_first
-     * @param pupilInfo.mother_name_middle
-     * @param pupilInfo.mother_birthday
-     * @param pupilInfo.mother_phone
-     * @param pupilInfo.mother_email
-     * @param pupilInfo.mother_work_place
-     * @param pupilInfo.mother_work_post
-     * @param pupilInfo.mother_work_phone
-     * @param pupilInfo.father_name_last
-     * @param pupilInfo.father_name_first
-     * @param pupilInfo.father_name_middle
-     * @param pupilInfo.father_birthday
-     * @param pupilInfo.father_phone
-     * @param pupilInfo.father_email
-     * @param pupilInfo.father_work_place
-     * @param pupilInfo.father_work_post
-     * @param pupilInfo.father_work_phone
      */
     function populateDetailPanel(pupilInfo) {
         $("#pupils-detail").find("dd").text("");
         if (pupilInfo) {
+            $("#pupils-detail-hint").addClass("hidden");
+            $("#pupils-detail-body").removeClass("hidden");
+            $("#pupils-detail-footer").removeClass("hidden");
             $("#pupil-upd-button").removeClass("hidden");
             $('#pupil-last-name').text(pupilInfo.name_last);
             $('#pupil-first-name').text(pupilInfo.name_first);
@@ -70,6 +133,9 @@ jQuery(function ($) {
             $('#father-work-post').text(pupilInfo.father_work_post);
             $('#father-work-phone').text(pupilInfo.father_work_phone);
         } else {
+            $("#pupils-detail-hint").removeClass("hidden");
+            $("#pupils-detail-body").addClass("hidden");
+            $("#pupils-detail-footer").addClass("hidden");
             $("#pupil-upd-button").addClass("hidden");
         }
     }
@@ -150,24 +216,6 @@ jQuery(function ($) {
         });
     }
 
-    function validatePupil() {
-        var lastName = $('#inputLastName').val();
-        var firstName = $('#inputFirstName').val();
-
-        if ((lastName === '') || (firstName === '')) {
-            alert('Необходимо указать фамилию и имя ученика');
-            return false;
-        }
-        if ($('#inputGender')[0].selectedIndex === 0) {
-            alert('Необходимо указать пол ученика');
-            return false;
-        }
-        if ($('#inputStudyFrom').val() === '') {
-            alert('Необходимо указать начало обучения ученика');
-            return false;
-        }
-        return true;
-    }
 
     function assemblePupil() {
         var lastName = $('#inputLastName').val();
@@ -213,97 +261,54 @@ jQuery(function ($) {
         return pupil;
     }
 
-    function hideEditPanel() {
-        // Clear the form inputs
+    function clearEditPanel(){
         $("#pupils-edit-form")[0].reset();
-        $('#pupils-table').bootstrapTable('refresh');
-        $("#pupils-edit-panel").addClass("hidden");
+}
+    function hideEditPanel(isNeedRefreshTable) {
+        clearEditPanel();
+        $("#pupils-form-modal").modal('hide');
+        // Clear the form inputs
+        /*$("#pupils-edit-panel").addClass("hidden");
         $("#pupils-detail").removeClass("hidden");
+        $("#table-cover").addClass("hidden");*/
+        if (isNeedRefreshTable)
+            $('#pupils-table').bootstrapTable('refresh');
+
     }
 
     // action: 'a' - добавить, 'u'-исправить
     function showEditPanel(action) {
-        $("#pupils-edit-panel").removeClass("hidden");
-        $("#pupils-detail").addClass("hidden");
         var ab = $("#pupil-add-do-button");
         var ub = $("#pupil-upd-do-button");
+        var db = $("#pupil-del-do-button");
+        var ttl = $("#pupils-form-modal-title");
         ab.addClass("hidden");
         ub.addClass("hidden");
-        if (action === "a") ab.removeClass("hidden");
-        if (action === "u") ub.removeClass("hidden");
+        db.addClass("hidden");
+        if (action === "a") {
+            ab.removeClass("hidden");
+            ttl.text("Добавление ученика");
+        }
+        if (action === "u") {
+            ub.removeClass("hidden");
+            db.removeClass("hidden");
+            ttl.text("Исправление ученика");
+        }
+
+        $("#pupils-form-modal").modal('show');
+
+
+        /*$("#pupils-edit-panel").removeClass("hidden");
+        $("#pupils-detail").addClass("hidden");
+        $("#table-cover").removeClass("hidden");*/
+
+
     }
 
     function finishEdit(response) {
-            hideEditPanel();
+            hideEditPanel(true);
             getPupilInfo(response.pupilId);
     }
 
 // Your jQuery code here, using the $
-    $(function () {
-        $("#pupil-add-button").on("click", function (event) {
-            event.preventDefault();
-            showEditPanel("a");
-        });
-
-        $("#pupil-upd-button").on("click", function (event) {
-            event.preventDefault();
-            showEditPanel("u");
-            populateEditForm(currentPupil);
-        });
-
-        $("#pupil-add-do-button").on("click", function (event) {
-            event.preventDefault();
-
-            if (validatePupil()) {
-                var pupil = assemblePupil();
-                // Ajax to post the object to our adduser service
-                $.ajax({
-                    type: 'POST',
-                    //data: pupil,
-                    data: {pipilData: JSON.stringify(pupil)},
-                    url: '/pupils/addpupil',
-                    dataType: 'JSON'
-                }).done(finishEdit);
-            }
-        });
-
-
-        $("#pupil-upd-do-button").on("click", function (event) {
-            event.preventDefault();
-
-            if (validatePupil()) {
-                var pupil = assemblePupil();
-                //noinspection JSUnresolvedVariable
-                pupil.$rn = currentPupil.rowid;
-                // Ajax to post the object to our adduser service
-                $.ajax({
-                    type: 'POST',
-                    //data: pupil,
-                    data: {pipilData: JSON.stringify(pupil)},
-                    url: '/pupils/updpupil',
-                    dataType: 'JSON'
-                }).done(finishEdit);
-            }
-        });
-
-        $("#pupil-add-cancel-button").on("click", function () {
-            $("#pupils-edit-panel").addClass("hidden");
-            $("#pupils-detail").removeClass("hidden");
-        });
-
-        $('#pupils-table').on('check.bs.table', function (row, $element) {
-            getPupilInfo($element.rn);
-        });
-
-        var detailPanel = $('#pupils-detail');
-        detailPanel.on('affix.bs.affix', function (a) {
-            var cv = a.target.clientWidth + 2;
-            a.target.style.width = cv + "px";
-        });
-
-        detailPanel.on('affix-top.bs.affix', function (a) {
-            //console.info('affix-top.bs.affix');
-            a.target.style.width = "";
-        });
-    });
 });

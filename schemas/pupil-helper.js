@@ -10,6 +10,39 @@ var pupilHelper = {};
  * @property birthday  - дата рождения (yyyy-mm-dd)
  */
 
+const CREATE_TABLE_PUPILS =
+    "CREATE TABLE IF NOT EXISTS pupils (" +
+    "   name_first TEXT," +
+    "   name_middle TEXT," +
+    "   name_last TEXT," +
+    "   birthday TEXT," +  // as ISO8601 strings ("YYYY-MM-DD HH:MM:SS.SSS").
+    "   gender TEXT," +
+    "   email TEXT," +
+    "   address_live TEXT," +
+    "   address_reg TEXT," +
+    "   phone_home TEXT," +
+    "   phone_cell TEXT," +
+    "   studied_from TEXT," +
+    "   studied_till TEXT," +
+    "   mother_name_first TEXT," +
+    "   mother_name_middle TEXT," +
+    "   mother_name_last TEXT," +
+    "   mother_birthday TEXT," +  //select strftime('%m', dateField) as Month ...
+    "   mother_email TEXT," +
+    "   mother_phone TEXT," +
+    "   mother_work_place TEXT," +
+    "   mother_work_post TEXT," +
+    "   mother_work_phone TEXT," +
+    "   father_name_first TEXT," +
+    "   father_name_middle TEXT," +
+    "   father_name_last TEXT," +
+    "   father_birthday TEXT," +
+    "   father_email TEXT," +
+    "   father_phone TEXT," +
+    "   father_work_place TEXT," +
+    "   father_work_post TEXT," +
+    "   father_work_phone TEXT" +
+    ")";
 const SELECT_PUPIL_BY_ID =
     "SELECT rowid, * FROM pupils WHERE rowid = $rn";
 
@@ -123,6 +156,10 @@ const INSERT_PUPIL =
     "   $father_work_phone" +
     ")";
 
+const DELETE_PUPIL =
+    "DELETE FROM pupils " +
+    "WHERE rowid = $id";
+
 /**
  * Получения короткого списка учеников на дату
  * если дата не задана то используется текущая
@@ -214,6 +251,22 @@ pupilHelper.insertPupil = function (params) {
                 params.pupilId = this.lastID;
                 resolve(params)
             }
+        });
+    });
+};
+
+/**
+ * Удаление записи ученика
+ * @param params
+ * @param params.db          - БД
+ * @param params.pupilId     - out rowid добавленного ученика
+ * @returns {Promise}
+ */
+pupilHelper.deletePupil = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.run(DELETE_PUPIL,{$id: params.pupilId},function (err) {
+            if (err) reject(err);
+            else resolve(params);
         });
     });
 };

@@ -1,0 +1,14 @@
+//
+   Created by igorgo on 10.05.2016.
+
+include ../mixins/form-input-mixin
+.panel-body.form-horizontal.container-fluid
+    .row
+        .col-lg-6
+            +inputDateLblH("form-make-debt-date","Дата",4,true)(required)
+        .col-lg-6
+            +inputCurrencyLblH("form-make-debt-summ","Сумма",4,true)(required, data-vnotzerro="true", data-vnotzerro-error="Сумма начисления не должна быть нулевой")
+    .row
+        .col-lg-12
+            +aButtonCancel("form-make-debt-cancel")
+            +aButtonOK("form-make-debt-ok")

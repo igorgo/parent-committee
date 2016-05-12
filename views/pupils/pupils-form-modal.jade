@@ -1,0 +1,97 @@
+//
+   Created by igorgo on 10.05.2016.
+include ../mixins/form-input-mixin
+#pupils-form-modal.modal.fade.small(tabindex="-1", role="dialog", aria-labelledby="pupils-form-modal-title", aria-hidden="true")
+    .modal-dialog.modal-lg
+        .modal-content
+            .modal-header
+                button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+                h4#pupils-form-modal-title.modal-title
+            form#pupils-edit-form.modal-body.form-group-sm
+                fieldset
+                    legend(style="margin-bottom: 0") Ученик
+                    .row.no-bottom
+                        .col-lg-4
+                            +inputTextLblV("inputLastName","", "Фамилия",  false)(required)
+                        .col-lg-4
+                            +inputTextLblV("inputFirstName","", "Имя",  false)(required)
+                        .col-lg-4
+                            +inputTextLblV("inputMiddleName","", "Отчество",  false)
+                    .row
+                        .col-lg-3
+                            +inputDateLblV("inputBirthday","Дата рождения")
+                        .col-lg-3
+                            +selectControlLblV("inputGender", "Пол", ['', 'Мужской', 'Женский'])(required)
+                        .col-lg-3
+                            +inputDateLblV("inputStudyFrom","Период обучения c")(required)
+                        .col-lg-3
+                            +inputDateLblV("inputStudyTill","по")
+                    .row
+                        .col-lg-6
+                                +inputGliphedNoLbl("inputLiveAddress","Адрес проживания", "home")
+                        .col-lg-6
+                                +inputGliphedNoLbl("inputRegAddress","Адрес регистрации", "link")
+                    .row.no-bottom
+                        .col-lg-4
+                            +inputPhoneNoLbl("inputHomePhone","Домашний","phone-alt")
+                        .col-lg-4
+                            +inputPhoneNoLbl("inputCellPhone","Мобильный","phone")
+                        .col-lg-4
+                            +inputEmailNoLbl("inputEmail","E-mail")
+                +toggledFieldset(true,'mother-inputs','Мама')
+                    .row.no-bottom
+                        .col-lg-4
+                            +inputTextLblV("inputMotherLastName","", "Фамилия",  false)
+                        .col-lg-4
+                            +inputTextLblV("inputMotherFirstName","", "Имя",  false)
+                        .col-lg-4
+                            +inputTextLblV("inputMotherMiddleName","", "Отчество",  false)
+                    .row.no-bottom
+                        .col-lg-4
+                            +inputDateLblV("inputMotherBirthday","Дата рождения")
+                        .col-lg-4
+                            +inputPhoneLblV("inputMotherCellPhone","Мобильный","Мобильный","phone")
+                        .col-lg-4
+                            +inputEmailLblV("inputMotherEmail","E-mail","E-mail")
+                    .row.no-bottom
+                        .col-lg-6
+                            +inputTextLblV("inputMotherWorkplace", "Место работы","Место работы")
+                        .col-lg-3
+                            +inputTextLblV("inputMotherPost", "Должность","Должность")
+                        .col-lg-3
+                            +inputPhoneLblV("inputMotherWorkPhone","Рабочий","Рабочий","earphone")
+                +toggledFieldset(true,'father-inputs','Папа')
+                    .row.no-bottom
+                        .col-lg-4
+                            +inputTextLblV("inputFatherLastName","", "Фамилия",  false)
+                        .col-lg-4
+                            +inputTextLblV("inputFatherFirstName","", "Имя",  false)
+                        .col-lg-4
+                            +inputTextLblV("inputFatherMiddleName","", "Отчество",  false)
+                    .row.no-bottom
+                        .col-lg-4
+                            +inputDateLblV("inputFatherBirthday","Дата рождения")
+                        .col-lg-4
+                            +inputPhoneLblV("inputFatherCellPhone","Мобильный","Мобильный","phone")
+                        .col-lg-4
+                            +inputEmailLblV("inputFatherEmail","E-mail","E-mail")
+                    .row.no-bottom
+                        .col-lg-6
+                            +inputTextLblV("inputFatherWorkplace", "Место работы","Место работы")
+                        .col-lg-3
+                            +inputTextLblV("inputFatherPost", "Должность","Должность")
+                        .col-lg-3
+                            +inputPhoneLblV("inputFatherWorkPhone","Рабочий","Рабочий","earphone")
+            .modal-footer
+                a#pupil-del-do-button.btn.btn-danger.btn-sm.pull-left(href='',style="margin-right:15px", data-toggle="modal" data-target="#confirm-delete")
+                    span.glyphicon.glyphicon-trash(aria-hidden="true", style="margin-right:8px")
+                    span Удалить ученика
+                a#pupil-add-cancel-button.btn.btn-primary.btn-sm.pull-right(href='')
+                    span.glyphicon.glyphicon-ban-circle(aria-hidden="true", style="margin-right:8px")
+                    span Отмена
+                a#pupil-add-do-button.btn.btn-primary.btn-sm.pull-right(href='')
+                    span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
+                    span Добавить
+                a#pupil-upd-do-button.btn.btn-primary.btn-sm.pull-right(href='#')
+                    span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
+                    span Исправить

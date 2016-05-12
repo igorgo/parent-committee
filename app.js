@@ -24,7 +24,8 @@ var app = express();
 var routes = require('./routes/index');
 var pupils = require('./routes/pupils-routers');
 var donates = require('./routes/donates-routes');
-var expenses = require('./routes/expenses');
+var expenses = require('./routes/expenses-routes');
+var open = require('open');
 
 var sqliteDbConnection = require("./schemas/sqlite-db");
 var updater = require("./schemas/db-updater");
@@ -34,6 +35,9 @@ app.locals.dataCache = {};
 updater(sqliteDbConnection)
     .then(function () {
         require("./common").cachePupilsShortList(app);
+        open('http://localhost:3000/', function (err) {
+            if (err) throw process.exit(1);
+        });
     })
     .catch(function (err) {
         console.error(err);
@@ -53,6 +57,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
+app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 
 app.use('/', routes);
 app.use('/pupils', pupils);

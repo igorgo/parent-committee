@@ -2,13 +2,13 @@ doctype html
 html
     head
         title='Родительский комитет'
+        link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/bower_components/bootstrap-table/dist/bootstrap-table.min.css')
+        link(rel='stylesheet', href='/bower_components/select2/dist/css/select2.min.css')
+        link(rel='stylesheet', href='/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
-        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css')
-        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css')
-        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css')
     body
         .container-fluid
-            .row
                 nav.navbar.navbar-default( role="navigation" )
                     .navbar-header
                         button.navbar-toggle.collapsed( type="button", data-toggle="collapse", data-target="#navbar-inverse", aria-expanded="false", aria-controls="navbar")
@@ -22,17 +22,23 @@ html
                             -var menuItems = { 'Главная':'/' , 'Ученики': '/pupils', 'Взносы':'/donates', 'Затраты':'/expenses'};
                             each val, key in menuItems
                                 if pageName === key
-                                    li.active: a( href="#")= key
+                                    li.active: a( href="" )= key
                                 else
-                                    li: a( href=val)= key
+                                    li: a.nav-a-m( href=val)= key
+                            li.pull-right: a#logoff( href="") Выйти
         block content
-        script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js')
-        script(src='/javascripts/jquery.inputmask.bundle.js')
-        script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js')
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-ru-RU.min.js')
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js')
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/i18n/ru.js')
+
+        script(src='/bower_components/jquery/dist/jquery.min.js')
+        script(src='/bower_components/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js')
+        script(src="/bower_components/tableExport.jquery.plugin/tableExport.min.js")
+        script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+        script(src='/bower_components/bootstrap-validator/dist/validator.min.js')
+        script(src='/bower_components/bootstrap-table/dist/bootstrap-table.min.js')
+        script(src='/bower_components/bootstrap-table/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.min.js')
+        script(src='/bower_components/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js')
+        script(src='/bower_components/bootstrap-table/dist/locale/bootstrap-table-ru-RU.min.js')
+        script(src='/bower_components/select2/dist/js/select2.min.js')
+        script(src='/bower_components/select2/dist/js/i18n/ru.js')
 
         script(src='/javascripts/global.js')
         if pageScript

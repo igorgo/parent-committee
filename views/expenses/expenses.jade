@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+    include exptype-new-form
+    #expenses-container.container-fluid.page-container
+        .row
+            include expenses-add-form
+        .row
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title Список расходов
+                .panel-body
+                    .row
+                        table(id="debtor-table")
+
+extends ../layout

@@ -1,0 +1,17 @@
+//
+   Created by igorgo on 10.05.2016.
+include ../mixins/form-input-mixin
+#donates-form-donate.panel-body.form-horizontal
+    .row
+        .col-lg-12
+            +selectControlLblH("form-make-donate-pupil", "Ученик", 2, [""],true)(required, data-error="Необходимо выбрать ученика")
+    .row
+        .col-lg-6
+            +inputDateLblH("form-make-donate-date","Дата",4,true)(required)
+        .col-lg-6
+            +inputCurrencyLblH("form-make-donate-summ","Сумма",4,true)(required, data-vnotzerro="true", data-vnotzerro-error="Сумма взноса не должна быть нулевой")
+.panel-footer
+    .row
+        .col-lg-12
+            +aButtonCancel("form-make-donate-cancel")
+            +aButtonOK("form-make-donate-ok")

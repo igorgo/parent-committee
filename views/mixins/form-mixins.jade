@@ -14,91 +14,229 @@ mixin inputGroupAddonGlyph(glyph)
         span( class="glyphicon glyphicon-#{glyph}")
 
 mixin formEdit(id, placeholder)
-    input(
-        class="form-control"
-        id= id
-        placeholder= placeholder
-        style="cursor: auto"
+    input.form-control.input-sm(
+    id= id
+    placeholder= placeholder
+    style="cursor: auto"
     )&attributes(attributes)
 
-mixin formEditGrid(id, placeholder, editWidth)
+mixin formEditGrid(id, placeholder, editWidth, errHelp)
+    div(class="col-lg-#{editWidth}")
+        .row.form-group
+            +formEdit(id, placeholder)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin formEditGridBase(id, placeholder, editWidth)
     div(class="col-lg-#{editWidth}")
         .row
             +formEdit(id, placeholder)&attributes(attributes)
 
-mixin textEdit(id, placeholder, editWidth)
-    +formEditGrid(id, placeholder, editWidth)(type="text")
+mixin textEdit(id, placeholder, editWidth, errHelp)
+    +formEditGrid(id, placeholder, editWidth)(type="text")&attributes(attributes)
 
-mixin dateEdit(id,  editWidth)
-    +formEditGrid(id, '', editWidth)(type="date")
+mixin textEditBase(id, placeholder, editWidth)
+    +formEditGridBase(id, placeholder, editWidth)(type="text")&attributes(attributes)
 
-mixin numberEdit(id,  editWidth)
-    +formEditGrid(id, '0', editWidth)(class="text-right" type="number")
+mixin dateEdit(id,  editWidth, errHelp)
+    +formEditGrid(id, '', editWidth)(type="date")&attributes(attributes)
 
-mixin currencyEdit(id, editWidth)
+mixin dateEditBase(id,  editWidth)
+    +formEditGridBase(id, '', editWidth)(type="date")&attributes(attributes)
+
+mixin numberEdit(id,  editWidth, errHelp)
+    +formEditGrid(id, '0', editWidth)(class="text-right" type="number")&attributes(attributes)
+
+mixin numberEditBase(id,  editWidth)
+    +formEditGridBase(id, '0', editWidth)(class="text-right" type="number")&attributes(attributes)
+
+mixin currencyEdit(id, editWidth, errHelp)
+    div.form-group(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +formEdit(id, '0,00', editWidth)(class="text-right" type="number", step="0.01")&attributes(attributes)
+                +inputGroupAddonText('₴')
+        if errHelp
+            .row.help-block.with-errors
+
+mixin currencyEditBase(id, editWidth)
     div(class="col-lg-#{editWidth}")
         .row
             .input-group
-                +formEdit(id, '0,00', editWidth)(class="text-right" type="number", step="0.01")
+                +formEdit(id, '0,00', editWidth)(class="text-right" type="number", step="0.01")&attributes(attributes)
                 +inputGroupAddonText('₴')
 
 
-mixin emailEdit(id, placeholder, editWidth)
+mixin emailEdit(id, placeholder, editWidth, errHelp)
+    div.form-group(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +inputGroupAddonText('@')
+                +formEdit(id, placeholder)(type="email")&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin emailEditBase(id, placeholder, editWidth)
     div(class="col-lg-#{editWidth}")
         .row
             .input-group
                 +inputGroupAddonText('@')
-                +formEdit(id, placeholder)(type="email")
+                +formEdit(id, placeholder)(type="email")&attributes(attributes)
 
+mixin glyphEdit(id,placeholder, editWidth, glyph, errHelp)
+    div.form-group(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +inputGroupAddonGlyph(glyph)
+                +formEdit(id, placeholder)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
 
-mixin glyphEdit(id,placeholder, editWidth, glyph)
+mixin glyphEditBase(id,placeholder, editWidth, glyph)
     div(class="col-lg-#{editWidth}")
         .row
             .input-group
                 +inputGroupAddonGlyph(glyph)
                 +formEdit(id, placeholder)&attributes(attributes)
 
-mixin phoneEdit(id,placeholder, editWidth, glyph)
+mixin phoneEdit(id,placeholder, editWidth, glyph, errHelp)
+    div.form-group(class="col-lg-#{editWidth}")
+        .row
+            .input-group
+                +inputGroupAddonGlyph(glyph)
+                +formEdit(id, placeholder)(type="tel" class="phone-mask")&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin phoneEditBase(id,placeholder, editWidth, glyph)
     div(class="col-lg-#{editWidth}")
         .row
             .input-group
                 +inputGroupAddonGlyph(glyph)
-                +formEdit(id, placeholder)(type="tel" class="phone-mask")
+                +formEdit(id, placeholder)(type="tel" class="phone-mask")&attributes(attributes)
 
-mixin selectEdit(id, editWidth, items)
+mixin selectEdit(id, editWidth, items, errHelp)
+    div.form-group(class="col-lg-#{editWidth}")
+        .row
+            select(
+            class="form-control"
+            id= id
+            )&attributes(attributes)
+                each item in items
+                    option= item
+        if errHelp
+            .row.help-block.with-errors
+
+mixin selectEditBase(id, editWidth, items)
     div(class="col-lg-#{editWidth}")
         .row
             select(
-                class="form-control"
-                id= id
-            )
+            class="form-control"
+            id= id
+            )&attributes(attributes)
                 each item in items
                     option= item
 
-mixin labeledTextEdit(id, text, labelWidth, editWidth)
-    label(for= id, class="col-lg-#{labelWidth} control-label")= text
-    +textEdit(id, text, editWidth)
+mixin labeledTextEdit(id, text, labelWidth, editWidth, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            +labelH(id,text,newLabelWidth)
+            +textEditBase(id, text, newEditWidth)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
 
-mixin labeledDateEdit(id, text, labelWidth, editWidth)
-    label(for= id, class="col-lg-#{labelWidth} control-label")= text
-    +dateEdit(id, editWidth)
+mixin labeledTextEditV(id, text, width, errHelp)
+    .form-group(class="col-lg-#{agrrWidth}")
+        +labelV(id,text)
+        +textEditBase(id, text, newEditWidth)&attributes(attributes)
+        +errorDivV(errHelp)
 
-mixin labeledNumberEdit(id, text, labelWidth, editWidth)
-    label(for= id, class="col-lg-#{labelWidth} control-label")= text
-    +numberEdit(id, editWidth)
+mixin errorDivV(errHelp)
+    if errHelp
+        .help-block.with-errors
 
-mixin labeledCurrencyEdit(id, text, labelWidth, editWidth)
-    label(for= id, class="col-lg-#{labelWidth} control-label")= text
-    +currencyEdit(id, editWidth)
+mixin labelH(id, text, width)
+    label.control-label.small(for= id, class="col-lg-#{width}")= text
 
-mixin labeledSelectEdit(id, text, labelWidth, editWidth, items)
-    label(for= id, class="col-lg-#{labelWidth} control-label")= text
-    +selectEdit(id, editWidth, items)
+mixin labelV(id, text)
+    label.control-label.small(for= id)= text
 
-mixin labeledEmailEdit(id, text, labelWidth, editWidth)
-    label(for= id, class="col-lg-#{labelWidth} control-label")= text
-    +emailEdit(id, text, editWidth)
+mixin labeledDateEdit(id, text, labelWidth, editWidth, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            label(for= id, class="col-lg-#{newLabelWidth} control-label")= text
+            +dateEditBase(id, newEditWidth)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
 
-mixin labeledPhoneEdit(id, text, labelWidth, editWidth, glyph)
-    label(for= id, class="col-lg-#{labelWidth} control-label")= text
-    +phoneEdit(id, text, editWidth, glyph)
+mixin labeledDateEditV(id, text, labelWidth, editWidth, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            label(for= id, class="col-lg-#{newLabelWidth} control-label")= text
+            +dateEditBase(id, newEditWidth)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin labeledNumberEdit(id, text, labelWidth, editWidth, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            label(for= id, class="col-lg-#{newLabelWidth} control-label")= text
+            +numberEditBase(id, newEditWidth)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin labeledCurrencyEdit(id, text, labelWidth, editWidth, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            label(for= id, class="col-lg-#{newLabelWidth} control-label")= text
+            +currencyEditBase(id, newEditWidth)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin labeledSelectEdit(id, text, labelWidth, editWidth, items, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            label(for= id, class="col-lg-#{newLabelWidth} control-label")= text
+            +selectEditBase(id, newEditWidth, items)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin labeledEmailEdit(id, text, labelWidth, editWidth, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            label(for= id, class="col-lg-#{newLabelWidth} control-label")= text
+            +emailEditBase(id, text, newEditWidth)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors
+
+mixin labeledPhoneEdit(id, text, labelWidth, editWidth, glyph, errHelp)
+    - var agrrWidth = labelWidth + editWidth;
+    - var newEditWidth = editWidth*(12/agrrWidth>>0);
+    - var newLabelWidth = 12-newEditWidth;
+    .form-group(class="col-lg-#{agrrWidth}")
+        .row
+            label(for= id, class="col-lg-#{newLabelWidth} control-label")= text
+            +phoneEditBase(id, text, newEditWidth, glyph)&attributes(attributes)
+        if errHelp
+            .row.help-block.with-errors

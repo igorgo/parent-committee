@@ -1,0 +1,25 @@
+extends ../layout
+include ../mixins/form-mixins
+
+block content
+    include donate-confirm-delete-dialog
+    #donates-container.container-fluid
+        .row
+            .col-lg-6
+                .panel.panel-default
+                    .panel-heading
+                        h4.panel-title Должники
+                    .panel-body
+                        table#debtor-table.table-condensed
+            .col-lg-6
+                #donates-right-panel(data-spy="affix", data-offset-top="100", data-offset-bottom="0")
+                    .panel.panel-default
+                        .panel-heading
+                            h4.panel-title Добавить взнос
+                        include donates-form-donate
+                    .panel.panel-default
+                        .panel-heading(role="tab")
+                            h4.panel-title
+                                a(role="button", data-toggle="collapse", href="#donates-form-make-debt") Начислить всем
+                        #donates-form-make-debt.panel-collapse.collapse
+                            include donates-form-debt

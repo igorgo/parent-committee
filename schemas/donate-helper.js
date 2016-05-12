@@ -3,6 +3,14 @@
  */
 var donateHelper = {};
 
+/*const CREATE_TABLE_DONATES =
+    "CREATE TABLE IF NOT EXISTS donates (" +
+    "   pupil INTEGER," +
+    "   summ REAL," +
+    "   date TEXT," +
+    "   FOREIGN KEY(pupil) REFERENCES pupils(rowid)" +
+    ")";*/
+
 const INSERT_DONATE =
     "INSERT INTO donates " +
     "(  pupil, summ, date ) " +
@@ -23,6 +31,7 @@ const SELECT_DEBTS_ON_DATE =
 const SELECT_DONATES_BY_PUPIL =
     "SELECT " +
     "  d.rowid as id, " +
+    "  d.pupil as pipil_id, " +
     "  d.date as oper_date, " +
     "  d.summ as oper_summ " +
     "FROM " +
@@ -33,7 +42,18 @@ const SELECT_DONATES_BY_PUPIL =
     " AND d.pupil = $pupil " +
     " AND d.date <= $onDate" +
     " ORDER BY d.date DESC";
-
+/*const SELECT_DONATE_BY_ID =
+    " SELECT * " +
+    " FROM " +
+    "  donates " +
+    " WHERE " +
+    "  rowid = $operid ";*/
+const DELETE_DONATE =
+    " DELETE " +
+    " FROM " +
+    "   donates " +
+    " WHERE " +
+    "   rowid = $operid ";
 
 /**
  * Добавление записи взноса
@@ -157,7 +177,6 @@ donateHelper.getDebtorOperations = function (params) {
  * @returns {Promise} ({db,donateId})
  */
 donateHelper.addDebt = function (params) {
-
     return new Promise(function (resolve, reject) {
         params.db.run(INSERT_DONATE, {
                 $pupil: params.donatePupil,
@@ -175,6 +194,26 @@ donateHelper.addDebt = function (params) {
     });
 };
 
-// TODO: Удаление записи
+
+/**
+ * Удаление записи взносов
+ * @param params
+ * @param params.db
+ * @param params.operId - id удаляемой операции
+ * @returns {Promise}
+ */
+donateHelper.delOper = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.run(
+            DELETE_DONATE,
+            {
+                $operid: params.operId
+            }, function (err) {
+                if (err) reject(err);
+                else resolve(params)
+            }
+        );
+    });
+};
 
 module.exports = donateHelper;

@@ -1,0 +1,179 @@
+//
+   Created by igorgo on 10.05.2016.
+
+mixin toggledFieldset(toggled, innerContainerId, text)
+    - var legAttr = toggled ? {'data-toggle':'collapse', 'data-target':"#"+innerContainerId , 'style':"cursor: pointer; margin-bottom: 0"} : {'style':'cursor: pointer; margin-bottom: 0'};
+    - var classes = toggled ? 'container-fluid collapse in' : 'container-fluid';
+    fieldset
+        legend&attributes(legAttr)= text
+        div(class=classes id=innerContainerId)
+            block
+mixin groupAddonText(text)
+    span( class="input-group-addon")= text
+mixin groupAddonGlyph(glyph)
+    span( class="input-group-addon")
+        span( class="glyphicon glyphicon-#{glyph}")
+mixin errDiv(errDiv)
+    if errDiv
+        .help-block.with-errors
+mixin inputBase(id, placeholder)
+    input.form-control.input-sm(id= id placeholder= placeholder style="cursor: auto")&attributes(attributes)
+mixin column(width)
+    div(class="col-lg-#{width}")&attributes(attributes)
+
+// Standalone controls
+mixin selectControl(id, items, errDiv)
+    select.form-control.input-sm(id= id)&attributes(attributes)
+        each item in items
+            option= item
+    +errDiv(errDiv)
+mixin inputText(id,placeholder,errDiv)
+    +inputBase(id, placeholder)&attributes(attributes)
+    +errDiv(errDiv)
+mixin inputDate(id,errDiv)
+    +inputBase(id,"")(type="date")&attributes(attributes)
+    +errDiv(errDiv)
+mixin inputNumber(id, errDiv)
+    +inputBase(id, "0")(class="text-right" type="number")&attributes(attributes)
+    +errDiv(errDiv)
+mixin inputPhone(id,placeholder,glyph,errDiv)
+    .input-group
+        +groupAddonGlyph(glyph)
+        +inputBase(id,placeholder)(type="tel" class="phone-mask")&attributes(attributes)
+    +errDiv(errDiv)
+mixin inputEmail(id,placeholder,errDiv)
+    .input-group
+        +groupAddonText('@')
+        +inputBase(id, placeholder)(type="email")&attributes(attributes)
+    +errDiv(errDiv)
+mixin inputGliphed(id,placeholder,glyph,errDiv)
+    .input-group
+        +groupAddonGlyph(glyph)
+        +inputBase(id,placeholder)(type="text")&attributes(attributes)
+    +errDiv(errDiv)
+mixin inputCurrency(id, errDiv)
+    .input-group
+        +inputBase(id, "0,00")(class="text-right" type="number", step="0.01")&attributes(attributes)
+        +groupAddonText('₴')
+    +errDiv(errDiv)
+// No lebeled
+mixin selectControlNoLbl(id, items, errDiv)
+    .form-group
+        select.form-control.input-sm(id= id)&attributes(attributes)
+            each item in items
+                option= item
+        +errDiv(errDiv)
+mixin inputTextNoLbl(id,placeholder,errDiv)
+    .form-group
+        +inputBase(id, placeholder)&attributes(attributes)
+        +errDiv(errDiv)
+mixin inputDateNoLbl(id,errDiv)
+    .form-group
+        +inputBase(id,"")(type="date")&attributes(attributes)
+        +errDiv(errDiv)
+mixin inputNumberNoLbl(id, errDiv)
+    .form-group
+        +inputBase(id, "0")(class="text-right" type="number")&attributes(attributes)
+        +errDiv(errDiv)
+mixin inputPhoneNoLbl(id,placeholder,glyph,errDiv)
+    .form-group
+        .input-group
+            +groupAddonGlyph(glyph)
+            +inputBase(id,placeholder)(type="tel" class="phone-mask")&attributes(attributes)
+        +errDiv(errDiv)
+mixin inputEmailNoLbl(id,placeholder,errDiv)
+    .form-group
+        .input-group
+            +groupAddonText('@')
+            +inputBase(id, placeholder)(type="email")&attributes(attributes)
+        +errDiv(errDiv)
+mixin inputGliphedNoLbl(id,placeholder,glyph,errDiv)
+    .form-group
+        .input-group
+            +groupAddonGlyph(glyph)
+            +inputBase(id,placeholder)(type="text")&attributes(attributes)
+        +errDiv(errDiv)
+mixin inputCurrencyNoLbl(id, errDiv)
+    .form-group
+        .input-group
+            +inputBase(id, "0,00")(class="text-right" type="number", step="0.01")&attributes(attributes)
+            +groupAddonText('₴')
+        +errDiv(errDiv)
+// Horizontal labeled controls
+mixin labelH(id,text,width)
+    label.control-label(for= id class="col-lg-#{width}")= text
+mixin hLabeledCtl(id,text,labelWidth)
+    - var editWidth = 12- labelWidth;
+    .form-group
+        +labelH(id, text,labelWidth)
+        div(class="col-lg-#{editWidth}")
+            block
+mixin inputTextLblH(id, placeholder, text, labelWidth, errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +inputText(id,placeholder,errDiv)&attributes(attributes)
+mixin inputDateLblH(id, text, labelWidth, errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +inputDate(id,errDiv)&attributes(attributes)
+mixin inputNumberLblH(id, text, labelWidth, errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +inputNumber(id,errDiv)&attributes(attributes)
+mixin selectControlLblH(id, text, labelWidth, items, errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +selectControl(id, items, errDiv)&attributes(attributes)
+mixin inputPhoneLblH(id,placeholder,text, glyph, labelWidth,errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +inputPhone(id,placeholder,glyph,errDiv)&attributes(attributes)
+mixin inputEmailLblH(id,placeholder,text,labelWidth,errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +inputEmail(id,placeholder,errDiv)&attributes(attributes)
+mixin inputGliphedLblH(id,placeholder,text, glyph, labelWidth,errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +inputGliphed(id,placeholder,glyph,errDiv)&attributes(attributes)
+mixin inputCurrencyLblH(id,text,labelWidth,errDiv)
+    +hLabeledCtl(id,text,labelWidth)
+        +inputCurrency(id, errDiv)&attributes(attributes)
+
+// Vertical labeled controls
+mixin labelV(id,text)
+    label.control-label(for= id)= text
+mixin vLabeledCtl(id,text)
+    .form-group
+        +labelV(id,text)
+        block
+mixin inputTextLblV(id, placeholder, text, errDiv)
+    +vLabeledCtl(id,text)
+        +inputText(id,placeholder,errDiv)&attributes(attributes)
+mixin inputDateLblV(id, text, errDiv)
+    +vLabeledCtl(id,text)
+        +inputDate(id,errDiv)&attributes(attributes)
+mixin inputNumberLblV(id, text, errDiv)
+    +vLabeledCtl(id,text)
+        +inputNumber(id,errDiv)&attributes(attributes)
+mixin selectControlLblV(id, text,  items, errDiv)
+    +vLabeledCtl(id,text)
+        +selectControl(id, items, errDiv)&attributes(attributes)
+mixin inputPhoneLblV(id,placeholder,text,glyph,errDiv)
+    +vLabeledCtl(id,text)
+        +inputPhone(id,placeholder,glyph,errDiv)&attributes(attributes)
+mixin inputEmailLblV(id,placeholder,text,errDiv)
+    +vLabeledCtl(id,text)
+        +inputEmail(id,placeholder,errDiv)&attributes(attributes)
+mixin inputGliphedLblV(id,placeholder,text, glyph, errDiv)
+    +vLabeledCtl(id,text)
+        +inputGliphed(id,placeholder,glyph,errDiv)&attributes(attributes)
+mixin inputCurrencyLblV(id,text,errDiv)
+    +vLabeledCtl(id,text)
+        +inputCurrency(id, errDiv)&attributes(attributes)
+
+// Buttons
+mixin aButtonOK(id,text)
+    - var bText = text ? text : "OK"
+    a.btn.btn-primary.btn-sm.pull-right(id= id href='')&attributes(attributes)
+        span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
+        span= bText
+mixin aButtonCancel(id)
+    a.btn.btn-primary.btn-sm.pull-right(id= id href='')&attributes(attributes)
+        span.glyphicon.glyphicon-ban-circle(aria-hidden="true", style="margin-right:8px")
+        span Отмена
+mixin aButtonDanger(id,text)
+    a.btn.btn-danger.btn-sm.pull-right(id= id)= text

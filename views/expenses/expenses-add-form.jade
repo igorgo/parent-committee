@@ -1,0 +1,37 @@
+//
+   Created by igorgo on 08.05.2016.
+include ../mixins/form-input-mixin
+.panel.panel-default
+    .panel-heading(role="tab")
+        h4.panel-title
+            a(role="button", data-toggle="collapse", href="#expense-form") Добавить расход
+    #expense-form.panel-collapse.collapse.in(data-toggle="validator" role="form")
+        .panel-body.form-horizontal
+            .row
+                .container.col-lg-8.col-md-offset-2
+                    .row
+                        label.col-lg-2.control-label(for="expense-form-combo-type") Тип расхода
+                        .col-lg-8
+                            .row
+                                select#expense-form-combo-type.form-control
+                                    option
+                        .col-lg-2
+                            .row
+                                a#expense-form-button-new-type.btn.btn-success(href='#', style="margin-left:8px")
+                                    span.glyphicon.glyphicon-plus(aria-hidden="true", style="margin-right:8px")
+                                    span Новый тип
+                    .row(style="margin-top:8px")
+                        +labeledDateEdit("expense-form-input-date","Дата",2,2)
+                        +labeledTextEdit("expense-form-input-descr", "Описание расхода", 2, 6)(required)
+                    .row(style="margin-top:8px")
+                        +labeledNumberEdit("expense-form-input-quant", "Количество", 2, 2)
+                        +labeledCurrencyEdit("expense-form-input-amount","Сумма",2,2)
+                        +labeledCurrencyEdit("expense-form-input-price","Цена",2,2)
+                    .row(style="margin-top:8px")
+                        .col-lg-3.col-md-offset-5
+                            a#expense-form-button-cancel.btn.btn-primary.pull-right(href='')
+                                span.glyphicon.glyphicon-ban-circle(aria-hidden="true", style="margin-right:8px")
+                                span Отмена
+                            a#expense-form-button-ok.btn.btn-primary.pull-right(href='', style="margin-right:15px")
+                                span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
+                                span Добавить

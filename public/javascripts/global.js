@@ -35,10 +35,32 @@ function s2d(val) {
     return (val) ? new Date(val).yyyymmdd() : null;
 }
 
+function localeCompareSort(s1, s2) {
+    return s1.toString().localeCompare(s2.toString());
+}
+
 jQuery(function($){
     // Your jQuery code here, using the $
     $(function() {
         $(".phone-mask").inputmask({"mask": "+38 (099) 999-9999"});
+
+        $("#logoff").on("click", function (event) {
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                //data: pupil,
+                url: '/logoff'
+            }).done(function(){
+                window.location.href = "about:blank";
+                window.close();
+            });
+        });
+
+        $(".nav-a-m").on("click", function (event) {
+            event.preventDefault();
+            console.log($(this)[0].href);
+            window.location.href = $(this)[0].href;
+        });
+
     });
 });
-
