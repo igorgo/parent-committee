@@ -16,16 +16,16 @@ html
                             span.icon-bar
                             span.icon-bar
                             span.icon-bar
-                        a.navbar-brand(href="#") Родительский комитет
+                        a.navbar-brand(href="javascript:void(0)") Родительский комитет
                     #navbar-inverse.collapse.navbar-collapse
                         ul.nav.navbar-nav
-                            -var menuItems = { 'Главная':'/' , 'Ученики': '/pupils', 'Взносы':'/donates', 'Затраты':'/expenses'};
+                            -var menuItems = { 'Главная':'/' , 'Ученики': '/pupils', 'Взносы':'/donates', 'Расходы':'/expenses'};
                             each val, key in menuItems
                                 if pageName === key
-                                    li.active: a( href="" )= key
+                                    li.active: a( href="javascript:void(0)" )= key
                                 else
                                     li: a.nav-a-m( href=val)= key
-                            li.pull-right: a#logoff( href="") Выйти
+                            li.pull-right: a#logoff( href="javascript:void(0)") Выйти
         block content
 
         script(src='/bower_components/jquery/dist/jquery.min.js')

@@ -1,0 +1,15 @@
+include ../mixins/form-input-mixin
+.row.sm-gutter.expense-row
+    .col-lg-3
+        +selectControlNoLbl("",[])(class = "form-add-expenses-type exp-type-combo", required)
+    .col-lg-5
+        +inputTextNoLbl()(class = "form-add-expenses-descr", required)
+    .col-lg-1
+        +inputNumberNoLbl()(class = "form-add-expenses-quant", step="0.001")
+    .col-lg-2
+        +inputCurrencyNoLbl()(class = "form-add-expenses-ammount", required)
+    .col-lg-1
+        a.btn.btn-success.btn-xs.exp-type-new-row(href="javascript:void(0)" title="Добавить строку")
+            span.glyphicon.glyphicon-plus(aria-hidden="true")
+        a.btn.btn-danger.btn-xs.exp-type-del-row(href="javascript:void(0)" title="Удалить строку")
+            span.glyphicon.glyphicon-minus(aria-hidden="true")

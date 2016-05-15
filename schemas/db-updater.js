@@ -5,61 +5,61 @@
 const CURRENT_DB_VERSION = 4;
 var dbVerOnStart;
 const CREATE_TABLE_PUPILS =
-    "CREATE TABLE IF NOT EXISTS [pupils](" +
-    "    [name_first] TEXT," +
-    "    [name_middle] TEXT," +
-    "    [name_last] TEXT," +
-    "    [birthday] TEXT," +  // as ISO8601 strings ("YYYY-MM-DD HH:MM:SS.SSS").
-    "    [gender] TEXT," +
-    "    [email] TEXT," +
-    "    [address_live] TEXT," +
-    "    [address_reg] TEXT," +
-    "    [phone_home] TEXT," +
-    "    [phone_cell] TEXT," +
-    "    [studied_from] TEXT," +
-    "    [studied_till] TEXT," +
-    "    [mother_name_first] TEXT," +
-    "    [mother_name_middle] TEXT," +
-    "    [mother_name_last] TEXT," +
-    "    [mother_birthday] TEXT," + //select strftime('%m', dateField) as Month ...
-    "    [mother_email] TEXT," +
-    "    [mother_phone] TEXT," +
-    "    [mother_work_place] TEXT," +
-    "    [mother_work_post] TEXT," +
-    "    [mother_work_phone] TEXT," +
-    "    [father_name_first] TEXT," +
-    "    [father_name_middle] TEXT," +
-    "    [father_name_last] TEXT," +
-    "    [father_birthday] TEXT," +
-    "    [father_email] TEXT," +
-    "    [father_phone] TEXT," +
-    "    [father_work_place] TEXT," +
-    "    [father_work_post] TEXT," +
-    "    [father_work_phone] TEXT," +
+    "CREATE TABLE [main].[pupils]( " +
+    "    [name_first] TEXT NOT NULL, " +
+    "    [name_middle] TEXT, " +
+    "    [name_last] TEXT NOT NULL, " +
+    "    [birthday] TEXT, " +  // as ISO8601 strings ("YYYY-MM-DD HH:MM:SS.SSS").
+    "    [gender] TEXT NOT NULL, " +
+    "    [email] TEXT, " +
+    "    [address_live] TEXT, " +
+    "    [address_reg] TEXT, " +
+    "    [phone_home] TEXT, " +
+    "    [phone_cell] TEXT, " +
+    "    [studied_from] TEXT NOT NULL, " + //select strftime('%m', dateField) as Month ...
+    "    [studied_till] TEXT, " +
+    "    [mother_name_first] TEXT, " +
+    "    [mother_name_middle] TEXT, " +
+    "    [mother_name_last] TEXT, " +
+    "    [mother_birthday] TEXT, " +
+    "    [mother_email] TEXT, " +
+    "    [mother_phone] TEXT, " +
+    "    [mother_work_place] TEXT, " +
+    "    [mother_work_post] TEXT, " +
+    "    [mother_work_phone] TEXT, " +
+    "    [father_name_first] TEXT, " +
+    "    [father_name_middle] TEXT, " +
+    "    [father_name_last] TEXT, " +
+    "    [father_birthday] TEXT, " +
+    "    [father_email] TEXT, " +
+    "    [father_phone] TEXT, " +
+    "    [father_work_place] TEXT, " +
+    "    [father_work_post] TEXT, " +
+    "    [father_work_phone] TEXT, " +
     "    CONSTRAINT [c_pupils_uk] UNIQUE([name_last], [name_first], [birthday], [name_middle]))";
 const CREATE_TABLE_DONATES =
-    "CREATE TABLE IF NOT EXISTS [donates](" +
-    "    [pupil] INTEGER," +
-    "    [summ] REAL," +
-    "    [date] TEXT," +
-    "    FOREIGN KEY([pupil]) REFERENCES pupils([rowid]))";
+    "CREATE TABLE [main].[donates]( " +
+    "    [pupil] INTEGER NOT NULL, " +
+    "    [summ] REAL NOT NULL, " +
+    "    [date] TEXT NOT NULL, " +
+    "    FOREIGN KEY([pupil]) REFERENCES pupils([rowid])) ";
 const CREATE_TABLE_CASH =
-    "CREATE TABLE IF NOT EXISTS [cash](" +
-    "    [oper_date] TEXT," +
-    "    [oper_type] TEXT," +  // 'I - приход (из донатов), O - расход, должен быть отрицательным (из расходов)
-    "    [oper_id] INTEGER," + // rowid в соответсвующей операции таблице
-    "    [oper_sum] REAL)";
+    "CREATE TABLE [main].[cash]( " +
+    "    [oper_date] TEXT NOT NULL, " +
+    "    [oper_type] TEXT NOT NULL, " +
+    "    [oper_id] INTEGER NOT NULL, " +
+    "    [oper_sum] REAL NOT NULL) ";
 const CREATE_TABLE_EXP_TYPES =
-    "CREATE TABLE IF NOT EXISTS [exptypes](" +
-    "    [name] TEXT," +
+    "CREATE TABLE [main].[exptypes]( " +
+    "    [name] TEXT NOT NULL, " +
     "    CONSTRAINT [c_exptypes_uk] UNIQUE([name]))";
 const CREATE_TABLE_EXPENSES =
-    "CREATE TABLE IF NOT EXISTS [expenses](" +
-    "    [exp_type] INTEGER," +
-    "    [exp_date] TEXT," +
-    "    [exp_quant] REAL," +
-    "    [exp_amount] REAL," +
-    "    [exp_descr] TEXT," +
+    "CREATE TABLE [main].[expenses]( " +
+    "    [exp_type] INTEGER NOT NULL, " +
+    "    [exp_date] TEXT NOT NULL, " +
+    "    [exp_quant] REAL NOT NULL DEFAULT 0, " +
+    "    [exp_amount] REAL NOT NULL, " +
+    "    [exp_descr] TEXT NOT NULL, " +
     "    FOREIGN KEY([exp_type]) REFERENCES exptypes([rowid]))";
 
 /**

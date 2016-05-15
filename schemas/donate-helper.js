@@ -54,6 +54,12 @@ const DELETE_DONATE =
     "   donates " +
     " WHERE " +
     "   rowid = $operid ";
+const SELECT_TOTALDEBT_ON_DATE =
+"SELECT SUM ([summ]) AS [debt] " +
+"FROM   [donates] " +
+"WHERE  [date] <= $ondate ";
+
+
 
 /**
  * Добавление записи взноса
@@ -194,7 +200,6 @@ donateHelper.addDebt = function (params) {
     });
 };
 
-
 /**
  * Удаление записи взносов
  * @param params
@@ -213,6 +218,29 @@ donateHelper.delOper = function (params) {
                 else resolve(params)
             }
         );
+    });
+};
+
+/**
+ * Подсчет несобранных взносов на дату $onddate
+ * @param params
+ * @param params.db
+ * @param params.$ondate
+ * @param params.totalDebt  out
+ * @returns {Promise}
+ */
+donateHelper.getTotalDebtOnDate = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.get(
+            SELECT_TOTALDEBT_ON_DATE,
+            params,
+            function (err, row) {
+                if (err) reject(err);
+                else {
+                    params.totalDebt = row;
+                    resolve(params);
+                }
+            });
     });
 };
 

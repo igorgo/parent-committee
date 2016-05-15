@@ -1,0 +1,11 @@
+.panel.panel-default
+    .panel-heading
+        .row
+            .col-lg-8.col-lg-offset-2
+                h4.panel-title.text-center Последние расходы
+            .col-lg-2
+                a#expense-button-new-expense.btn.btn-success.btn-sm.pull-right(href='javascript:void(0)', style="margin-left:8px")
+                    span.glyphicon.glyphicon-plus(aria-hidden="true", style="margin-right:8px")
+                    span Внести расходы
+    .panel-body
+        table#expenses-table.table-condensed

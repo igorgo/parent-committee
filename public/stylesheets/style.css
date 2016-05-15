@@ -33,6 +33,12 @@ a {
     padding-right:0;
     padding-left:0;
 }
+
+.sm-gutter > [class*='col-'] {
+    padding-right:2px;
+    padding-left:2px;
+}
+
 .no-bottom .form-group {
     margin-bottom:0;
 }
@@ -52,6 +58,10 @@ a {
 hr.no-margin{
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.ml5 {
+    margin-left: 5px;
 }
 
 .has-error .select2-selection {

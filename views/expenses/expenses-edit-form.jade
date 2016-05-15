@@ -1,0 +1,31 @@
+include ../mixins/form-input-mixin
+#dialog-edit-expenses.modal.fade.small(tabindex="-1", role="dialog", aria-labelledby="dialog-edit-expenses-title", aria-hidden="true")
+    .modal-dialog.modal-lg
+        .modal-content
+            .modal-header
+                button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+                h4#dialog-edit-expenses-title.modal-title Исправление расхода
+            #form-edit-expenses.modal-body.form-vertical
+                .row
+                    .col-lg-3
+                        a#form-edit-expenses-button-new-type.btn.btn-success.btn-sm(href='javascript:void(0)', style="margin-left:8px")
+                            span.glyphicon.glyphicon-plus(aria-hidden="true", style="margin-right:8px")
+                            span Новый тип расходов
+                    .col-lg-6
+                        +inputDateLblH("form-edit-expenses-date", "Дата расходов", 4)(required)
+                    .col-lg-3
+                .row.sm-gutter
+                    .col-lg-3
+                        +selectControlLblV("form-edit-expenses-type","Тип",[])(required)
+                    .col-lg-5
+                        +inputTextLblV("form-edit-expenses-descr", "", "Описание")(required)
+                    .col-lg-1
+                        +inputNumberLblV("form-edit-expenses-quant","К-во")(step="0.001")
+                    .col-lg-2
+                        +inputCurrencyLblV("form-edit-expenses-ammount","Сумма")(required)
+                    .col-lg-1
+            .modal-footer
+                .row
+                    .col-lg-12
+                        +aButtonCancel("form-edit-expenses-cancel")
+                        +aButtonOK("form-edit-expenses-ok")

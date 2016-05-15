@@ -1,6 +1,3 @@
-//
-   Created by igorgo on 10.05.2016.
-
 mixin toggledFieldset(toggled, innerContainerId, text)
     - var legAttr = toggled ? {'data-toggle':'collapse', 'data-target':"#"+innerContainerId , 'style':"cursor: pointer; margin-bottom: 0"} : {'style':'cursor: pointer; margin-bottom: 0'};
     - var classes = toggled ? 'container-fluid collapse in' : 'container-fluid';
@@ -21,7 +18,6 @@ mixin inputBase(id, placeholder)
 mixin column(width)
     div(class="col-lg-#{width}")&attributes(attributes)
 
-// Standalone controls
 mixin selectControl(id, items, errDiv)
     select.form-control.input-sm(id= id)&attributes(attributes)
         each item in items
@@ -56,7 +52,7 @@ mixin inputCurrency(id, errDiv)
         +inputBase(id, "0,00")(class="text-right" type="number", step="0.01")&attributes(attributes)
         +groupAddonText('₴')
     +errDiv(errDiv)
-// No lebeled
+
 mixin selectControlNoLbl(id, items, errDiv)
     .form-group
         select.form-control.input-sm(id= id)&attributes(attributes)
@@ -99,7 +95,7 @@ mixin inputCurrencyNoLbl(id, errDiv)
             +inputBase(id, "0,00")(class="text-right" type="number", step="0.01")&attributes(attributes)
             +groupAddonText('₴')
         +errDiv(errDiv)
-// Horizontal labeled controls
+
 mixin labelH(id,text,width)
     label.control-label(for= id class="col-lg-#{width}")= text
 mixin hLabeledCtl(id,text,labelWidth)
@@ -133,7 +129,6 @@ mixin inputCurrencyLblH(id,text,labelWidth,errDiv)
     +hLabeledCtl(id,text,labelWidth)
         +inputCurrency(id, errDiv)&attributes(attributes)
 
-// Vertical labeled controls
 mixin labelV(id,text)
     label.control-label(for= id)= text
 mixin vLabeledCtl(id,text)
@@ -165,14 +160,13 @@ mixin inputCurrencyLblV(id,text,errDiv)
     +vLabeledCtl(id,text)
         +inputCurrency(id, errDiv)&attributes(attributes)
 
-// Buttons
 mixin aButtonOK(id,text)
     - var bText = text ? text : "OK"
-    a.btn.btn-primary.btn-sm.pull-right(id= id href='')&attributes(attributes)
+    a.btn.btn-primary.btn-sm.pull-right(id= id href='javascript:void(0)')&attributes(attributes)
         span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
         span= bText
 mixin aButtonCancel(id)
-    a.btn.btn-primary.btn-sm.pull-right(id= id href='')&attributes(attributes)
+    a.btn.btn-primary.btn-sm.pull-right(id= id href='javascript:void(0)')&attributes(attributes)
         span.glyphicon.glyphicon-ban-circle(aria-hidden="true", style="margin-right:8px")
         span Отмена
 mixin aButtonDanger(id,text)

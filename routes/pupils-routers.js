@@ -104,7 +104,7 @@ function addPupil(req, res, next) {
 }
 
 /**
- * REST DELETE /pupils/delpupil/:id - Удаление ученика из БД
+ * REST DELETE /pupils/delpupil/:id - Удаление ученика по rowid
  * @param req
  * @param res
  * @param next

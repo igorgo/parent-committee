@@ -1,16 +1,11 @@
 extends ../layout
-
 block content
+    include ../mixins/form-input-mixin
+    include expenses-add-form
+    include expenses-edit-form
     include exptype-new-form
-    #expenses-container.container-fluid.page-container
+    include ../confirm-delete-dialog
+    #expenses-container.container-fluid
         .row
-            include expenses-add-form
-        .row
-            .panel.panel-default
-                .panel-heading
-                    h4.panel-title Список расходов
-                .panel-body
-                    .row
-                        table(id="debtor-table")
-
-extends ../layout
+            .col-lg-12
+                include expenses-table

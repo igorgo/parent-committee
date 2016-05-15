@@ -30,7 +30,7 @@ jQuery(function ($) {
         $o.formDebt.btnOk = $("#form-make-debt-ok");
         $o.formDebt.btnCancel = $("#form-make-debt-cancel");
         $o.dlgDeleteOper = $("#confirm-delete");
-        $o.dlgDeleteOper.btnDelete= $("#oper-del-conf-button");
+        $o.dlgDeleteOper.btnDelete= $("#conf-del-ok-button");
     }
 
     /**
@@ -95,7 +95,7 @@ jQuery(function ($) {
     }
 
     /**
-     * Валидация вормы
+     * Валидация формы
      * @returns {boolean}
      */
     function validateForm(form) {
@@ -113,7 +113,6 @@ jQuery(function ($) {
         form.validator('validate');
         return (form.find(".has-error").length > 0);
     }
-
 
     /**
      * Инициализация формы начисления
@@ -298,7 +297,9 @@ jQuery(function ($) {
                         {
                             field: "oper_summ",
                             title: "Сумма",
-                            sortable: true
+                            sortable: true,
+                            align: "right",
+                            formatter: formatCurrency
                         },
                         {
                             align: 'center',

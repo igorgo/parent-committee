@@ -35,6 +35,14 @@ function s2d(val) {
     return (val) ? new Date(val).yyyymmdd() : null;
 }
 
+function n2c(val) {
+    return (val) ? (val).formatMoney(2, '₴') : null;
+}
+
+function n2q(val) {
+    return (val) ? (val).formatMoney(3,"") : null;
+}
+
 function localeCompareSort(s1, s2) {
     return s1.toString().localeCompare(s2.toString());
 }

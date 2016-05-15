@@ -1,37 +1,36 @@
-//
-   Created by igorgo on 08.05.2016.
-include ../mixins/form-input-mixin
-.panel.panel-default
-    .panel-heading(role="tab")
-        h4.panel-title
-            a(role="button", data-toggle="collapse", href="#expense-form") Добавить расход
-    #expense-form.panel-collapse.collapse.in(data-toggle="validator" role="form")
-        .panel-body.form-horizontal
-            .row
-                .container.col-lg-8.col-md-offset-2
-                    .row
-                        label.col-lg-2.control-label(for="expense-form-combo-type") Тип расхода
-                        .col-lg-8
-                            .row
-                                select#expense-form-combo-type.form-control
-                                    option
-                        .col-lg-2
-                            .row
-                                a#expense-form-button-new-type.btn.btn-success(href='#', style="margin-left:8px")
-                                    span.glyphicon.glyphicon-plus(aria-hidden="true", style="margin-right:8px")
-                                    span Новый тип
-                    .row(style="margin-top:8px")
-                        +labeledDateEdit("expense-form-input-date","Дата",2,2)
-                        +labeledTextEdit("expense-form-input-descr", "Описание расхода", 2, 6)(required)
-                    .row(style="margin-top:8px")
-                        +labeledNumberEdit("expense-form-input-quant", "Количество", 2, 2)
-                        +labeledCurrencyEdit("expense-form-input-amount","Сумма",2,2)
-                        +labeledCurrencyEdit("expense-form-input-price","Цена",2,2)
-                    .row(style="margin-top:8px")
-                        .col-lg-3.col-md-offset-5
-                            a#expense-form-button-cancel.btn.btn-primary.pull-right(href='')
-                                span.glyphicon.glyphicon-ban-circle(aria-hidden="true", style="margin-right:8px")
-                                span Отмена
-                            a#expense-form-button-ok.btn.btn-primary.pull-right(href='', style="margin-right:15px")
-                                span.glyphicon.glyphicon-ok-circle(aria-hidden="true", style="margin-right:8px")
-                                span Добавить
+#dialog-add-expenses.modal.fade.small(tabindex="-1", role="dialog", aria-labelledby="dialog-add-expenses-title", aria-hidden="true")
+    .modal-dialog.modal-lg
+        .modal-content
+            .modal-header
+                button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+                h4#dialog-add-expenses-title.modal-title Добавление новых расходов
+            #form-add-expenses.modal-body.form-vertical
+                .row
+                    .col-lg-3
+                        a#form-add-expenses-button-new-type.btn.btn-success.btn-sm(href='javascript:void(0)', style="margin-left:8px")
+                            span.glyphicon.glyphicon-plus(aria-hidden="true", style="margin-right:8px")
+                            span Новый тип расходов
+                    .col-lg-6
+                        +inputDateLblH("form-add-expenses-date", "Дата расходов", 4)(required)
+                    .col-lg-3
+                        dl
+                            dt Итoго:
+                            dd#form-add-expenses-total-ammount
+                .row.sm-gutter
+                    .col-lg-3.text-center
+                        strong Тип
+                    .col-lg-5.text-center
+                        strong Описание
+                    .col-lg-1.text-center
+                        strong К-во
+                    .col-lg-2.text-center
+                        strong Сумма
+                    .col-lg-1
+                .row
+                    #form-add-expenses-detail.col-lg-12
+            .modal-footer
+                .row
+                    .col-lg-12
+                        +aButtonCancel("form-add-expenses-cancel")
+                        +aButtonOK("form-add-expenses-ok")
+

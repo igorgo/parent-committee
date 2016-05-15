@@ -1,6 +1,4 @@
 extends ../layout
-include ../mixins/form-mixins
-
 block content
     include pupils-confirm-delete-dialog
     include pupils-form-modal
@@ -28,11 +26,10 @@ block content
                     .panel-footer
                         .row
                             .col-lg-12.text-center
-                                a#pupil-add-button.btn.btn-success(href='#')
+                                a#pupil-add-button.btn.btn-success(href='javascript:void(0)')
                                     span.glyphicon.glyphicon-plus(aria-hidden="true", style="margin-right:8px")
                                     span Новый ученик
                     #table-cover.cover.hidden
-            //include pupils-edit
             .col-lg-6
                 include pupils-info
 

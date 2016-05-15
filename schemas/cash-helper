@@ -4,17 +4,31 @@
 var cashHelper = {};
 
 const INSERT_CASH =
-    "INSERT INTO cash " +
-    "( oper_date, oper_type, oper_id, oper_sum ) " +
-    "VALUES " +
-    "( $oper_date, $oper_type, $oper_id, $oper_sum )";
+    "INSERT INTO [cash] " +
+    "    ([oper_date], " +
+    "    [oper_type], " +
+    "    [oper_id], " +
+    "    [oper_sum]) " +
+    "    VALUES ($oper_date, $oper_type, $oper_id, $oper_sum) ";
 const DELETE_INCOME_BY_TYPE_AND_ID =
-    " DELETE " +
-    " FROM " +
-    "   cash " +
-    " WHERE " +
-    "      oper_type = $operType " +
-    "  and oper_id   = $operId ";
+    "DELETE FROM " +
+    "    [cash] " +
+    "WHERE " +
+    "    [oper_type] = $operType " +
+    "AND [oper_id] = $operId ";
+const UPDATE_OUT_BY_EXPENSE_ID =
+    "UPDATE " +
+    "    [cash] " +
+    "SET " +
+    "    [oper_date] = $exp_date, " +
+    "    [oper_sum] = $exp_amount " +
+    "WHERE " +
+    "    [oper_id] = $expenseId " +
+    "AND [oper_type] = 'O' ";
+const SELECT_REMNANT_ON_DATE =
+    "SELECT SUM ([oper_sum]) AS [remn] " +
+    "FROM   [cash] " +
+    "WHERE  [oper_date] <= $ondate ";
 
 /**
  * Добавление прихода в кассу (из взносов)
@@ -27,12 +41,41 @@ const DELETE_INCOME_BY_TYPE_AND_ID =
  * @returns {Promise} ({db,outId})
  */
 cashHelper.addFromDonate = function (params) {
-    return new Promise(function (resolve,reject) {
-        params.db.run(INSERT_CASH,{
+    return new Promise(function (resolve, reject) {
+        params.db.run(INSERT_CASH, {
                 $oper_id: params.donateId,
                 $oper_date: params.donateDate,
                 $oper_sum: params.donateAmount,
                 $oper_type: "I"
+            }, function (err) {
+                if (err) reject(err);
+                else {
+                    //noinspection JSUnresolvedVariable
+                    params.cashId = this.lastID;
+                    resolve(params);
+                }
+            }
+        );
+    });
+};
+
+/**
+ * Добавление расхода из кассs (из расходов)
+ * @param params
+ * @param params.db              - in/out - БД
+ * @param params.expenseId      - in     - id в таблице DONATES
+ * @param params.exp_date       - in     - дата взноса
+ * @param params.exp_amount     - in     - сумма взноса
+ * @param params.cashId        - out    - id добавленной кассовой операции
+ * @returns {Promise} ({db,outId})
+ */
+cashHelper.addFromExpenses = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.run(INSERT_CASH, {
+                $oper_id: params.expenseId,
+                $oper_date: params.exp_date,
+                $oper_sum: params.exp_amount * -1,
+                $oper_type: "O"
             }, function (err) {
                 if (err) reject(err);
                 else {
@@ -57,10 +100,10 @@ cashHelper.delFromDonate = function (params) {
         params.db.run(
             DELETE_INCOME_BY_TYPE_AND_ID,
             {
-                $operId : params.operId,
+                $operId: params.operId,
                 $operType: 'I'
             },
-            function(err) {
+            function (err) {
                 if (err) reject(err);
                 else (resolve(params));
             }
@@ -68,4 +111,75 @@ cashHelper.delFromDonate = function (params) {
     });
 };
 
+/**
+ * Удаление расхода (из расходов)
+ * @param params
+ * @param params.db
+ * @param params.expenseId - id расхода
+ * @returns {Promise}
+ */
+cashHelper.delFromExpenses = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.run(
+            DELETE_INCOME_BY_TYPE_AND_ID,
+            {
+                $operId: params.expenseId,
+                $operType: 'O'
+            },
+            function (err) {
+                if (err) reject(err);
+                else (resolve(params));
+            }
+        );
+    });
+};
+
+/**
+ * Исправление операции расхода
+ * @param params
+ * @param params.db
+ * @param params.expenseId
+ * @param params.exp_date
+ * @param params.exp_amount
+ * @returns {Promise}
+ */
+cashHelper.updFromExpenses = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.run(
+            UPDATE_OUT_BY_EXPENSE_ID,
+            {
+                $expenseId: params.expenseId,
+                $exp_date: params.exp_date,
+                $exp_amount: params.exp_amount
+            },
+            function (err) {
+                if (err) reject(err);
+                else (resolve(params));
+            });
+    });
+};
+
+/**
+ * Подсчет остатка в кассе на дату $onddate
+ * @param params
+ * @param params.db
+ * @param params.$ondate
+ * @param params.remnant  out
+ * @returns {Promise}
+ */
+cashHelper.getRemnantOnDate = function (params) {
+    return new Promise(function (resolve, reject) {
+        params.db.get(
+            SELECT_REMNANT_ON_DATE,
+            params,
+            //{$ondate : params.$ondate},
+            function (err, row) {
+                if (err) reject(err);
+                else {
+                    params.remnant = row;
+                    resolve(params);
+                }
+            });
+    });
+};
 module.exports = cashHelper;

@@ -13,7 +13,8 @@ Date.prototype.yyyymmdd = function () {
 };
 // TODO: Expenses page
 // TODO: Main page
-// TODO: Print reporting, see http://pdfkit.org/
+// TODO: Страница сервис (бэкап, токсировка...)
+// TODO: Print reporting, see http://pdfkit.org/ или эксель
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -41,7 +42,7 @@ updater(sqliteDbConnection)
     })
     .catch(function (err) {
         console.error(err);
-        process.exit(1);
+        sqliteDbConnection.close(function () {process.exit(1)});
     });
 
 
