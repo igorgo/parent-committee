@@ -77,13 +77,8 @@ jQuery(function ($) {
                 url: '/donates/makedonate',
                 dataType: 'JSON'
             }).done(function (response) {
-                if (response.status === 'success') {
                     clearMakeDonateForm();
                     $o.tableDebtors.bootstrapTable('refresh');
-                }
-                else {
-                    alert('Error:' + response.error);
-                }
             });
         });
         // Кнопка Отмена
